@@ -7,12 +7,13 @@
 {
     gallery: list[String], // 갤러리 이미지 url list
     campuses: list[{
+        id: String, // 캠퍼스 고유아이디
         name: String, // 캠퍼스 이름
-        imgUrl: String // 캠퍼스 이미지 url
+        add: String // 캠퍼스 주소
     }],
     awards: list[{
-        imgUrl: String, // 어워드 이미지 url,
-        id: String // 어워드 고유아이디
+        id: String, // 어워드 고유아이디
+        imgUrl: String, // 어워드 이미지 url
     }]
     books: list[{
         name: String, // book 이름
@@ -34,8 +35,8 @@
 {
     gallery: list[String], // 갤러리 이미지 url list
     notices: list[{
-        title: String,
         id: String, // 공지 글 고유아이디
+        title: String
     }],
     posters: list[{
         title: String,
@@ -45,6 +46,8 @@
     map: {
         lat: Number, // 캠퍼스 찾아오시는 길 위치 정보
         lng: Number // 캠퍼스 찾아오시는 길 위치 정보
-    }
+    },
+    add: String, // 캠퍼스 주소
+    call: String // 캠퍼스 전화번호
 }
 ```
