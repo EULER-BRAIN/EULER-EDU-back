@@ -22,8 +22,12 @@ app.use(session);
 app.use(require('cookie-parser')());
 app.use(require('cors')({ origin: true, credentials: true }));
 
+/* middlewares */
+app.use(require('./src/middlewares/auth'));
+
 /* route */
 app.use("/main", require("./src/route/main"));
+app.use("/login", require("./src/route/login"));
 app.use("/admin", require("./src/route/admin"));
 
 /* create a Express Server */

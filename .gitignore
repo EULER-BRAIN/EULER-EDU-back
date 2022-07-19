@@ -1,4 +1,5 @@
 /node_modules
 /ssl
+/sessions
 .env
 .adminjs

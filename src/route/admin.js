@@ -1,7 +1,7 @@
 const express = require('express');
 const AdminJS = require('adminjs');
 const AdminJSExpress = require('@adminjs/express');
-const { galleryModel, campusModel, awardModel, bookModel } = require("../db/mongo");
+const { galleryModel, campusModel, awardModel, bookModel, teacherModel } = require("../db/mongo");
 
 // Registration of the mongoose adapter
 const AdminJSMongoose = require('@adminjs/mongoose');
@@ -17,7 +17,8 @@ const adminJs = new AdminJS({
     galleryModel,
     campusModel,
     awardModel,
-    bookModel
+    bookModel,
+    teacherModel,
   ]
 });
 

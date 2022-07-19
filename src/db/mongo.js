@@ -36,7 +36,12 @@ const bookSchema = Schema({
 });
 const teacherSchema = Schema({
   level: { type: String, default: 'teacher' },
+  id: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  salt: { type: String, required: true },
+  name: { type: String, default: 'teacher-unnamed' },
   campus: { type: Schema.Types.ObjectId, ref: "Campus", required: true },
+  // administrator | director | teacher
 });
 const parentSchema = Schema({
   name: { type: String, default: 'parent-unnamed' },
@@ -59,6 +64,7 @@ const testsetSchema = Schema({
 });
 const testSchema = Schema({
   student: { type: Schema.Types.ObjectId, ref: "Student", required: true },
+  teacher: { type: Schema.Types.ObjectId, ref: "Teacher", required: true },
   test: { type: Schema.Types.ObjectId, ref: "Testset", required: true },
   date: { type: Date, required: true },
 });
@@ -95,4 +101,5 @@ module.exports = {
   campusModel: mongoose.model("Campus", campusSchema),
   awardModel: mongoose.model("Award", awardSchema),
   bookModel: mongoose.model("Book", bookSchema),
+  teacherModel: mongoose.model("Teacher", teacherSchema),
 };
