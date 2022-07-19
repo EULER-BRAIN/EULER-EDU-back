@@ -34,6 +34,38 @@ const bookSchema = Schema({
   registDate: { type: Date, required: true },
   priority: { type: Number, default: 0 },
 });
+const teacherSchema = Schema({
+  level: { type: String, default: 'teacher' },
+  campus: { type: Schema.Types.ObjectId, ref: "Campus", required: true },
+});
+const parentSchema = Schema({
+  name: { type: String, default: 'parent-unnamed' },
+  phone: { type: String, required: true },
+  students: [{ type: Schema.Types.ObjectId, ref: "Student", required: true }]
+})
+const studentSchema = Schema({
+  name: { type: Date, required: true },
+  birth: { type: String, required: true },
+  password: { type: String, required: true },
+  registDate: { type: Date, required: true },
+});
+const courseSchema = Schema({
+  name: { type: String, default: 'course-unnamed' },
+  students: [{ type: Schema.Types.ObjectId, ref: "Student", required: true }]
+});
+const testsetSchema = Schema({
+  name: { type: String, default: 'testset-unnamed' },
+  registDate: { type: Date, required: true },
+});
+const testSchema = Schema({
+  student: { type: Schema.Types.ObjectId, ref: "Student", required: true },
+  test: { type: Schema.Types.ObjectId, ref: "Testset", required: true },
+  date: { type: Date, required: true },
+});
+const erecordSchema = Schema({
+  student: { type: Schema.Types.ObjectId, ref: "Student", required: true },
+  date: { type: Date, required: true },
+});
 
 /* database setting */
 const database = mongoose.connection;
