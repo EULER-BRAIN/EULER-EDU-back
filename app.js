@@ -22,6 +22,10 @@ app.use(session);
 app.use(require('cookie-parser')());
 app.use(require('cors')({ origin: true, credentials: true }));
 
+/* route */
+app.use("/main", require("./src/route/main"));
+app.use("/admin", require("./src/route/admin"));
+
 /* create a Express Server */
 if (env.port.http) {
   const http = require("http");
