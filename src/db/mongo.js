@@ -12,10 +12,14 @@ const gallerySchema = Schema({
 const campusSchema = Schema({
   id: { type: String, required: true, unique: true },
   name: { type: String, default: 'campus-unnamed' },
+  subname: { type: String, default: '' },
   address: { type: String, default: '' },
+  call: { type: String, default: '' },
   isShow: { type: Boolean, default: true },
+  priority: { type: Number, default: 0 },
   lat: { type: Number, required: true },
   lng: { type: Number, required: true },
+  naverMapUrl: { type: String, default: '' },
 });
 const awardSchema = Schema({
   name: { type: String, default: 'award-unnamed' },
