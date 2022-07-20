@@ -41,8 +41,12 @@ const loginTeacher = (req, level, id, name, cb) => {
   });
 }
 
-const logout = (req, cb) => {
+const logout = (req, res, cb) => {
+  res.status(200).clearCookie('connect.sid', {
+    path: '/'
+  });
   req.session.destroy((err) => {
+    req.session = null;
     if (cb) cb(err);
   })
 }

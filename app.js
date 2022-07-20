@@ -20,7 +20,7 @@ const session = expressSession({
   // cookie:{ httpOnly: true, sameSite: 'none', maxAge: 5300000, secure: true }
 });
 app.use(session);
-app.use(require('cookie-parser')());
+// app.use(require('cookie-parser')());
 
 /* middlewares */
 app.use(require('./src/middlewares/auth'));

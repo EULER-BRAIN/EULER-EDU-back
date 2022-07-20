@@ -68,7 +68,7 @@ router.post('/try/teacher', [
 });
 
 router.get('/logout', (req, res) => {
-  logout(req, (err) => {
+  logout(req, res, (err) => {
     if (err) {
       return res.status(401).json({
         error: "login/try/teacher : internal server error"
