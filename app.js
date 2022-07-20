@@ -17,7 +17,7 @@ const session = expressSession({
   secret: env.session || 'session-secret',
   resave: false, saveUninitialized: false,
   store: new sessionFileStore({ logFn: function(){}, useAsync: true }),
-  cookie:{ httpOnly: true, sameSite: 'none', maxAge: 5300000, secure: true }
+  // cookie:{ httpOnly: true, sameSite: 'none', maxAge: 5300000, secure: true }
 });
 app.use(session);
 app.use(require('cookie-parser')());
