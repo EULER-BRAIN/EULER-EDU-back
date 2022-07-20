@@ -3,15 +3,15 @@ const getLoginInfo = (req) => {
     const { time } = req.session.loginInfo;
     const timeFlow = Date.now() - time;
     if (0 <= timeFlow && timeFlow <= 3600000) {
-      req.session.time = Date.now();
-      const { level, isStudent, isTeacher, students, id, name } = req.session;
+      req.session.loginInfo.time = Date.now();
+      const { level, isStudent, isTeacher, students, id, name } = req.session.loginInfo;
       return { level, isStudent, isTeacher, students, id, name };
     }
   }
   return {};
 }
 
-const loginParent = (req, students) => {
+const loginParent = (req, students, cb) => {
   req.session.loginInfo = { 
     level: 'student',
     isStudent: true,
@@ -21,9 +21,12 @@ const loginParent = (req, students) => {
     name: '',
     time: Date.now()
   };
+  req.session.save((err) => {
+    if (cb) cb(err);
+  });
 }
 
-const loginTeacher = (req, level, id, name) => {
+const loginTeacher = (req, level, id, name, cb) => {
   req.session.loginInfo = {
     level: level,
     isStudent: false,
@@ -33,11 +36,14 @@ const loginTeacher = (req, level, id, name) => {
     name: name,
     time: Date.now()
   }
+  req.session.save((err) => {
+    if (cb) cb(err);
+  });
 }
 
-const logout = (req, cb = () => {}) => {
+const logout = (req, cb) => {
   req.session.destroy((err) => {
-    cb(err);
+    if (cb) cb(err);
   })
 }
 

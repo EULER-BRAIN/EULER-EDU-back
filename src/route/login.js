@@ -35,7 +35,7 @@ router.post('/try/teacher', [
   if (!teacher) {
     return res.json({
       result: false,
-      msg: '잘못된 아이디'
+      msg: '존재하지 않는 아이디입니다'
     })
   }
   hasher({ password: pw, salt: teacher.salt }, (err, pass, salt, hash) => {
@@ -45,15 +45,23 @@ router.post('/try/teacher', [
       })
     }
     else if (hash == teacher.password || teacher.salt == 'empty') {
-      loginTeacher(req, teacher.level, teacher.id, teacher.name);
-      return res.json({
-        result: true
-      })
+      loginTeacher(req, teacher.level, teacher.id, teacher.name, (err) => {
+        if (err) {
+          return res.status(401).json({
+            error: "login/try/teacher : internal server error"
+          })
+        }
+        else {
+          return res.json({
+            result: true
+          })
+        }
+      });
     }
     else {
       return res.json({
         result: false,
-        msg: '잘못된 비밀번호'
+        msg: '잘못된 비밀번호입니다'
       })
     }
   })

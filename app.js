@@ -7,20 +7,20 @@ const app = express();
 app.use(express.urlencoded({ limit: "50mb", extended: false }));
 app.use(express.json({ limit: "50mb" }));
 
-/* session */
+/* cors */
+app.use(require('cors')({ origin: true, credentials: true }));
+
+/* session, cookie */
 const expressSession = require('express-session');
 const sessionFileStore = require('session-file-store')(expressSession);
 const session = expressSession({
-    secret: env.session || ' ',
-    resave: false, saveUninitialized: false,
-    store: new sessionFileStore({ logFn: function(){}, useAsync: true }),
-    cookie:{ httpOnly: true, sameSite: 'none', maxAge: 5300000, secure: true }
+  secret: env.session || 'session-secret',
+  resave: false, saveUninitialized: false,
+  store: new sessionFileStore({ logFn: function(){}, useAsync: true }),
+  cookie:{ httpOnly: true, sameSite: 'none', maxAge: 5300000, secure: true }
 });
 app.use(session);
-
-/* cookie, cors */
 app.use(require('cookie-parser')());
-app.use(require('cors')({ origin: true, credentials: true }));
 
 /* middlewares */
 app.use(require('./src/middlewares/auth'));
