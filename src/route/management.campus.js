@@ -68,7 +68,7 @@ router.post("/teacher/info", [
   catch (e) {
     console.log(e);
     return res.status(401).json({
-      error: "/management/campus/teacher/info : internal server error"
+      error: "management/campus/teacher/info : internal server error"
     })
   }
 })
@@ -120,7 +120,7 @@ router.post("/teacher/edit/name", [
   catch (e) {
     console.log(e);
     return res.status(401).json({
-      error: "/management/campus/teacher/edit/name : internal server error"
+      error: "management/campus/teacher/edit/name : internal server error"
     })
   }
 })
@@ -162,7 +162,7 @@ router.post("/teacher/edit/password", [
       if (err) {
         console.log(err);
         return res.status(401).json({
-          error: "/management/campus/teacher/edit/password : internal server error"
+          error: "management/campus/teacher/edit/password : internal server error"
         })
       }
       const teacherAfter = await teacherModel.findOneAndUpdate({
@@ -181,7 +181,7 @@ router.post("/teacher/edit/password", [
   catch (e) {
     console.log(e);
     return res.status(401).json({
-      error: "/management/campus/teacher/edit/password : internal server error"
+      error: "management/campus/teacher/edit/password : internal server error"
     })
   }
 })
