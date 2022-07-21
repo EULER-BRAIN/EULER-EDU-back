@@ -29,6 +29,7 @@ app.use(require('./src/middlewares/auth'));
 app.use("/main", require("./src/route/main"));
 app.use("/login", require("./src/route/login"));
 app.use("/admin", require("./src/route/admin"));
+app.use("/management", require("./src/route/management"));
 
 /* create a Express Server */
 if (env.port.http) {

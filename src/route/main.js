@@ -25,7 +25,7 @@ router.get("/:cid", async (req, res) => {
     });
 
     if (!campus) {
-      return res.status(402).json({
+      return res.status(403).json({
         error: "main/:cid : no corresponding campus"
       })
     }
