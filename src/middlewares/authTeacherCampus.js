@@ -22,7 +22,7 @@ module.exports = async (req, res, next) => {
   
     if (req.loginLevel != 'administrator') {
       const teacher = await teacherModel.findOne({ id: req.loginId }, "campus");
-      if (teacher?.campus != campus._id) {
+      if (teacher?.campus.toString() != campus._id.toString()) {
         return res.status(402).json({
           error: "authTeacherCampus : Permission denied"
         });
