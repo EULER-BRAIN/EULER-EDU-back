@@ -5,9 +5,10 @@ const AWS = require('aws-sdk');
 const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
 
 // function to list Object
-const getS3List = (cb) => {
+const getS3List = (directoryPath, cb) => {
   s3.listObjects({
-    Bucket: env.aws.s3BucketName
+    Bucket: env.aws.s3BucketName,
+    Prefix: directoryPath
   }, (err, data) => {
     cb(err, data);
   });

@@ -9,7 +9,7 @@ AdminJS.registerAdapter(AdminJSMongoose);
 
 // create router
 const router = express.Router();
-router.use(require("../middlewares/adminJs"));
+router.use(require('../middlewares/authTeacher')('administrator'));
 
 const adminJs = new AdminJS({
   rootPath: '/admin',
