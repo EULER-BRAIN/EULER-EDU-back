@@ -11,8 +11,12 @@ router.post("/teacher", async (req, res) => {
         error: "/management/campus/teacher : Permission denied"
       });
     }
-    const teachers = await teacherModel.find({
+    let teachers = await teacherModel.find({
       campus: req.campusId
+    });
+    teachers = teachers.map(item => {
+      item.campusName = req.campusName
+      return item
     });
     res.json({ teachers });
   }

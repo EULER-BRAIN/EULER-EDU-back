@@ -13,7 +13,7 @@ module.exports = async (req, res, next) => {
       });
     }
   
-    const campus = await campusModel.findById(campusId, "_id");
+    const campus = await campusModel.findById(campusId, "_id name");
     if (!campus) {
       return res.status(402).json({
         error: "authTeacherCampus : Permission denied"
@@ -29,6 +29,7 @@ module.exports = async (req, res, next) => {
       }
     }
     req.campusId = campus._id;
+    req.campusName = campus.name;
     next();
   }
   catch (e) {
