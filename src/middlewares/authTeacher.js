@@ -1,5 +1,3 @@
-const { getLoginInfo } = require('../tools/login');
-
 module.exports = (level) => (req, res, next) => {
   const minLevel = level || 'teacher';
   const levelOrder = ['teacher', 'director', 'administrator'];

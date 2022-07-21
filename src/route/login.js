@@ -19,6 +19,18 @@ router.get('/getInfo', (req, res) => {
   })
 });
 
+router.get('/getInfo/campus', async (req, res) => {
+  if (!req.isTeacher) {
+    return res.json({
+      campus: null
+    });
+  }
+  const result = await teacherModel.findOne({ id: req.loginId }, "campus");
+  return res.json({
+    campus: result?.campus
+  });
+});
+
 router.post('/try/teacher', [
   body("id").matches(patterns.loginId),
   body("pw").matches(patterns.loginPw),
