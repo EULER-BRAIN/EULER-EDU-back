@@ -29,6 +29,7 @@ app.use(require('./src/middlewares/auth'));
 app.use("/main", require("./src/route/main"));
 app.use("/login", require("./src/route/login"));
 app.use("/admin", require("./src/route/admin"));
+const tmp = require('./src/tools/awsS3');
 
 /* create a Express Server */
 if (env.port.http) {
