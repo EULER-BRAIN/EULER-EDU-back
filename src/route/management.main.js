@@ -7,7 +7,7 @@ router.use(require('../middlewares/authTeacher')('administrator'));
 
 router.get("/award", async (req, res) => {
   try {
-    const awards = await awardModel.find().sort({ registDate: -1 });
+    const awards = await awardModel.find().sort('-registDate isShow');
     if (!awards) {
       return res.status(403).json({
         error: "management/main/award : no corresponding teacher"
@@ -43,7 +43,7 @@ router.get("/award", async (req, res) => {
         if (!imgCheck[item]) {
           ret.push({
             _id: item,
-            name: 'S3-Dummy',
+            name: 'S3-Contra',
             content: 'DB에 등록되어 있지 않은 이미지가 S3에 저장되어 있습니다.',
             isShow: false,
             isImg: true,
