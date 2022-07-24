@@ -55,12 +55,14 @@ router.get("/notice/:id", param("id").isMongoId(), valid(async (req, res) => {
       })
     }
     const teacher = await teacherModel.findById(notice.author, "_id id name campus");
-    if (!teacher) {
+    const campus = await campusModel.findById(notice.campus, "_id id name");
+    if (!teacher || !campus) {
       return res.status(401).json({
         error: "main/notice/:id : internal server error"
       })
     }
     notice.author = teacher;
+    notice.campus = campus;
     return res.json({
       notice: notice
     })

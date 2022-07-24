@@ -40,6 +40,7 @@ const noticeSchema = Schema({
   registDate: { type: Date, required: true },
   modifyDate: { type: Date, required: true },
   isShow: { type: Boolean, default: true },
+  campus: { type: Schema.Types.ObjectId, ref: "Campus", required: true },
   author: { type: Schema.Types.ObjectId, ref: "Teacher", required: true }
 });
 const teacherSchema = Schema({
