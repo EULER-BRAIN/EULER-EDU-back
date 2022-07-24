@@ -25,13 +25,20 @@ router.get("/:cid", valid(async (req, res) => {
     const campus = await campusModel.findOne({
       id: req.params.cid, isShow: true
     });
-
     if (!campus) {
       return res.status(403).json({
         error: "main/:cid : no corresponding campus"
       })
     }
-    return res.json({ campus });
+    const notices = await noticeModel.find({
+      campus: campus._id,
+      isShow: true
+    }, "_id title modifyDate").sort("-modifyDate").limit(5);
+    return res.json({
+      campus,
+      notices,
+      dateNow: new Date()
+    });
   }
   catch (e) {
     console.log(e);
@@ -41,7 +48,7 @@ router.get("/:cid", valid(async (req, res) => {
   }
 }));
 
-router.get("/notice/:id", param("id").isMongoId(), valid(async (req, res) => {
+router.get("/notice/content/:id", param("id").isMongoId(), valid(async (req, res) => {
   try {
     const notice = await noticeModel.findById(req.params.id);
     if (!notice) {

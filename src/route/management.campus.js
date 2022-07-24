@@ -1,5 +1,5 @@
 const express = require('express');
-const { teacherModel } = require('../db/mongo');
+const { teacherModel, noticeModel } = require('../db/mongo');
 const { query, param, body } = require("express-validator");
 const valid = require('../tools/valid');
 const patterns = require('../db/regExpPatterns');
@@ -162,6 +162,39 @@ router.post("/teacher/edit/password", [
     console.log(e);
     return res.status(401).json({
       error: "management/campus/teacher/edit/password : internal server error"
+    })
+  }
+}));
+
+router.post("/notice/add", [
+  body("title").matches(patterns.noticeTitle),
+], valid(async (req, res) => {
+  try {
+    const dateNow = new Date();
+    const author = await teacherModel.findOne({ id: req.loginId }, "_id");
+    if (!author) {
+      return res.status(401).json({
+        error: "management/campus/notice/add : internal server error"
+      })
+    }
+    const notice = new noticeModel({
+      title: req.body.title,
+      content: req.body.content,
+      registDate: dateNow,
+      modifyDate: dateNow,
+      isShow: true,
+      campus: req.campusId,
+      author: author._id
+    });
+    const noticeSaved = await notice.save();
+    res.json({
+      notice: noticeSaved
+    })
+  }
+  catch (e) {
+    console.log(e);
+    return res.status(401).json({
+      error: "management/campus/notice/add : internal server error"
     })
   }
 }));
