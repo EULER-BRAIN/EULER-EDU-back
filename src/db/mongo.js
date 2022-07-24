@@ -34,6 +34,13 @@ const bookSchema = Schema({
   registDate: { type: Date, required: true },
   priority: { type: Number, default: 0 },
 });
+const noticeSchema = Schema({
+  title: { type: String, default: 'notice-unnamed' },
+  content: { type: String, default: '' },
+  registDate: { type: Date, required: true },
+  modifyDate: { type: Date, required: true },
+  isShow: { type: Boolean, default: true },
+});
 const teacherSchema = Schema({
   level: { type: String, default: 'teacher' },
   id: { type: String, required: true, unique: true },
@@ -101,5 +108,6 @@ module.exports = {
   campusModel: mongoose.model("Campus", campusSchema),
   awardModel: mongoose.model("Award", awardSchema),
   bookModel: mongoose.model("Book", bookSchema),
+  noticeModel: mongoose.model("Notice", noticeSchema),
   teacherModel: mongoose.model("Teacher", teacherSchema),
 };

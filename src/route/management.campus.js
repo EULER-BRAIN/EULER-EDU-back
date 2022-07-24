@@ -1,6 +1,7 @@
 const express = require('express');
 const { teacherModel } = require('../db/mongo');
-const { query, param, body, validationResult } = require("express-validator");
+const { query, param, body } = require("express-validator");
+const valid = require('../tools/valid');
 const patterns = require('../db/regExpPatterns');
 const bkfd2Password = require("pbkdf2-password");
 const hasher = bkfd2Password();
@@ -39,14 +40,7 @@ router.post("/teacher", async (req, res) => {
 
 router.post("/teacher/info", [
   body("id").matches(patterns.loginId),
-], async (req, res) => {
-  const validationErrors = validationResult(req);
-  if (!validationErrors.isEmpty()) {
-    return res.status(400).json({
-      error: "management/campus/teacher/info : bad request",
-    });
-  }
-
+], valid(async (req, res) => {
   try {
     if (req.loginLevel != 'administrator' && req.loginLevel != 'director') {
       return res.status(402).json({
@@ -71,19 +65,12 @@ router.post("/teacher/info", [
       error: "management/campus/teacher/info : internal server error"
     })
   }
-})
+}));
 
 router.post("/teacher/edit/name", [
   body("id").matches(patterns.loginId),
   body("name").matches(patterns.name),
-], async (req, res) => {
-  const validationErrors = validationResult(req);
-  if (!validationErrors.isEmpty()) {
-    return res.status(400).json({
-      error: "management/campus/teacher/edit/name : bad request",
-    });
-  }
-
+], valid(async (req, res) => {
   try {
     const teacher = await teacherModel.findOne({
       id: req.body.id
@@ -123,19 +110,12 @@ router.post("/teacher/edit/name", [
       error: "management/campus/teacher/edit/name : internal server error"
     })
   }
-})
+}));
 
 router.post("/teacher/edit/password", [
   body("id").matches(patterns.loginId),
   body("password").matches(patterns.loginPw),
-], async (req, res) => {
-  const validationErrors = validationResult(req);
-  if (!validationErrors.isEmpty()) {
-    return res.status(400).json({
-      error: "management/campus/teacher/edit/password : bad request",
-    });
-  }
-
+], valid(async (req, res) => {
   try {
     const teacher = await teacherModel.findOne({
       id: req.body.id
@@ -184,6 +164,6 @@ router.post("/teacher/edit/password", [
       error: "management/campus/teacher/edit/password : internal server error"
     })
   }
-})
+}));
 
 module.exports = router;

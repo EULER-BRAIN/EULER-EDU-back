@@ -1,8 +1,10 @@
 const express = require('express');
 const { galleryModel, campusModel, awardModel, bookModel } = require("../db/mongo");
+const { query, param, body } = require("express-validator");
+const valid = require('../tools/valid');
 const router = express.Router();
 
-router.get("/", async (req, res) => {
+router.get("/", valid(async (req, res) => {
   try {
     const galleries = await galleryModel.find({ isShow: true }).sort({ modifyDate: -1 });
     const campuses = await campusModel.find({ isShow: true }, "id name subname").sort({ priority: -1 });
@@ -16,9 +18,9 @@ router.get("/", async (req, res) => {
       error: "main : internal server error"
     })
   }
-})
+}));
 
-router.get("/:cid", async (req, res) => {
+router.get("/:cid", valid(async (req, res) => {
   try {
     const campus = await campusModel.findOne({
       id: req.params.cid, isShow: true
@@ -37,6 +39,10 @@ router.get("/:cid", async (req, res) => {
       error: "main/:cid : internal server error"
     })
   }
-});
+}));
+
+router.get("/notice/:id", param("id").isMongoId(), valid((req, res) => {
+  console.log(123);
+}))
 
 module.exports = router;

@@ -1,6 +1,7 @@
 const express = require('express');
 const { teacherModel } = require('../db/mongo');
-const { query, param, body, validationResult } = require("express-validator");
+const { query, param, body } = require("express-validator");
+const valid = require('../tools/valid');
 const patterns = require('../db/regExpPatterns');
 const bkfd2Password = require("pbkdf2-password");
 const hasher = bkfd2Password();
@@ -34,7 +35,7 @@ router.get('/getInfo/campus', async (req, res) => {
 router.post('/try/teacher', [
   body("id").matches(patterns.loginId),
   body("pw").matches(patterns.loginPw),
-], async (req, res) => {
+], valid(async (req, res) => {
   const validationErrors = validationResult(req);
   if (!validationErrors.isEmpty()) {
     return res.status(400).json({
@@ -77,7 +78,7 @@ router.post('/try/teacher', [
       })
     }
   })
-});
+}));
 
 router.get('/logout', (req, res) => {
   logout(req, res, (err) => {
