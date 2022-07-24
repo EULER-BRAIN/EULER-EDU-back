@@ -1,3 +1,4 @@
+const env = require('../tools/env');
 const express = require('express');
 const AdminJS = require('adminjs');
 const AdminJSExpress = require('@adminjs/express');
@@ -9,7 +10,9 @@ AdminJS.registerAdapter(AdminJSMongoose);
 
 // create router
 const router = express.Router();
-router.use(require('../middlewares/authTeacher')('administrator'));
+if (env.port.dev != 'local') {
+  router.use(require('../middlewares/authTeacher')('administrator'));
+}
 
 const adminJs = new AdminJS({
   rootPath: '/admin',
