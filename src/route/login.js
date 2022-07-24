@@ -36,13 +36,6 @@ router.post('/try/teacher', [
   body("id").matches(patterns.loginId),
   body("pw").matches(patterns.loginPw),
 ], valid(async (req, res) => {
-  const validationErrors = validationResult(req);
-  if (!validationErrors.isEmpty()) {
-    return res.status(400).json({
-      error: "login/try/teacher : bad request",
-    });
-  }
-
   const { id, pw } = req.body;
   const teacher = await teacherModel.findOne({ id: id });
   if (!teacher) {

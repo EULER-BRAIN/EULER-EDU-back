@@ -1,5 +1,5 @@
 const express = require('express');
-const { galleryModel, campusModel, awardModel, bookModel } = require("../db/mongo");
+const { galleryModel, campusModel, awardModel, bookModel, noticeModel, teacherModel } = require("../db/mongo");
 const { query, param, body } = require("express-validator");
 const valid = require('../tools/valid');
 const router = express.Router();
@@ -41,8 +41,36 @@ router.get("/:cid", valid(async (req, res) => {
   }
 }));
 
-router.get("/notice/:id", param("id").isMongoId(), valid((req, res) => {
-  console.log(123);
-}))
+router.get("/notice/:id", param("id").isMongoId(), valid(async (req, res) => {
+  try {
+    const notice = await noticeModel.findById(req.params.id);
+    if (!notice) {
+      return res.status(403).json({
+        error: "main/notice/:id : no corresponding campus"
+      })
+    }
+    if (!notice.isShow) {
+      return res.status(403).json({
+        error: "main/notice/:id : no corresponding campus"
+      })
+    }
+    const teacher = await teacherModel.findById(notice.author, "_id id name campus");
+    if (!teacher) {
+      return res.status(401).json({
+        error: "main/notice/:id : internal server error"
+      })
+    }
+    notice.author = teacher;
+    return res.json({
+      notice: notice
+    })
+  }
+  catch (e) {
+    console.log(e);
+    return res.status(401).json({
+      error: "main/notice/:id : internal server error"
+    })
+  }
+}));
 
 module.exports = router;
