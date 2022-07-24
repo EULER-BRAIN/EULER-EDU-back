@@ -1,6 +1,9 @@
 const express = require('express');
 const awsS3 = require('../db/awsS3');
 const { awardModel } = require('../db/mongo');
+const { query, param, body } = require("express-validator");
+const valid = require('../tools/valid');
+const patterns = require('../db/regExpPatterns');
 const router = express.Router();
 
 router.use(require('../middlewares/authTeacher')('administrator'));
@@ -9,8 +12,8 @@ router.get("/award", async (req, res) => {
   try {
     const awards = await awardModel.find().sort('-registDate isShow');
     if (!awards) {
-      return res.status(403).json({
-        error: "management/main/award : no corresponding teacher"
+      return res.status(401).json({
+        error: "management/main/award : internal server error"
       })
     }
     awsS3.getS3List('awards/', (err, awardsS3) => {
@@ -63,5 +66,148 @@ router.get("/award", async (req, res) => {
     })
   }
 })
+
+router.get("/award/info/:id", [
+  param("id").isMongoId(),
+], valid(async (req, res) => {
+  try {
+    const id = req.params.id;
+    const award = await awardModel.findById(id);
+    if (!award) {
+      return res.status(403).json({
+        error: "management/main/award/info/:id : no corresponding teacher"
+      })
+    }
+    awsS3.foundObject(`awards/${ award._id }.png`, (err, data) => {
+      const imgFound = (err ? false : true);
+      res.json({ award, imgFound })
+    })
+  }
+  catch(e) {
+    console.log(e);
+    return res.status(401).json({
+      error: "management/main/award/info/:id : internal server error"
+    })
+  }
+}));
+
+router.post("/award/edit/name", [
+  body("id").isMongoId(),
+  body("name").matches(patterns.awardName),
+], valid(async (req, res) => {
+  try {
+    const award = await awardModel.findOneAndUpdate({
+      _id: req.body.id
+    }, {
+      name: req.body.name
+    }, {
+      new: true
+    });
+    res.json({
+      award: award
+    });
+  }
+  catch(e) {
+    console.log(e);
+    return res.status(401).json({
+      error: "management/main/award/edit/name : internal server error"
+    })
+  }
+}));
+
+router.post("/award/edit/content", [
+  body("id").isMongoId(),
+  body("content").matches(patterns.awardContent),
+], valid(async (req, res) => {
+  try {
+    const award = await awardModel.findOneAndUpdate({
+      _id: req.body.id
+    }, {
+      content: req.body.content
+    }, {
+      new: true
+    });
+    res.json({
+      award: award
+    });
+  }
+  catch(e) {
+    console.log(e);
+    return res.status(401).json({
+      error: "management/main/award/edit/content : internal server error"
+    })
+  }
+}));
+
+router.post("/award/edit/isShow", [
+  body("id").isMongoId(),
+  body("isShow").isBoolean(),
+], valid(async (req, res) => {
+  try {
+    const award = await awardModel.findOneAndUpdate({
+      _id: req.body.id
+    }, {
+      isShow: req.body.isShow
+    }, {
+      new: true
+    });
+    res.json({
+      award: award
+    });
+  }
+  catch(e) {
+    console.log(e);
+    return res.status(401).json({
+      error: "management/main/award/edit/isShow : internal server error"
+    })
+  }
+}));
+
+router.get("/award/img/delete/:id", [
+  param("id").isMongoId(),
+], valid(async (req, res) => {
+  try {
+    const id = req.params.id;
+    const award = await awardModel.findById(id);
+    if (!award) {
+      return res.status(403).json({
+        error: "management/main/award/img/delete/:id : no corresponding teacher"
+      })
+    }
+    awsS3.deleteObject(`awards/${ award._id }.png`, (err, data) => {
+      if (err) {
+        return res.status(401).json({
+          error: "management/main/award/img/delete/:id : internal server error"
+        })
+      }
+      res.json({
+        award
+      })
+    })
+  }
+  catch(e) {
+    console.log(e);
+    return res.status(401).json({
+      error: "management/main/award/img/delete/:id : internal server error"
+    })
+  }
+}));
+
+router.get("/award/delete/:id", [
+  param("id").isMongoId(),
+], valid(async (req, res) => {
+  try {
+    await awardModel.findByIdAndDelete({ _id: req.params.id });
+    res.json({
+      result: true
+    })
+  }
+  catch(e) {
+    console.log(e);
+    return res.status(401).json({
+      error: "management/main/award/delete/:id : internal server error"
+    })
+  }
+}));
 
 module.exports = router;

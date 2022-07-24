@@ -24,4 +24,24 @@ const getUploadPUrl = (filePath) => {
   return presignedUrl;
 }
 
-module.exports = { getS3List, getUploadPUrl }
+// function to delete object
+const deleteObject = (filePath, cb) => {
+  s3.deleteObject({
+    Bucket: env.aws.s3BucketName,
+    Key: filePath,
+  }, (err, data) => {
+    cb(err, data);
+  });
+}
+
+// function to check exist of Object
+const foundObject = (filePath, cb) => {
+  s3.headObject({
+    Bucket: env.aws.s3BucketName,
+    Key: filePath,
+  }, (err, data) => {
+    cb(err, data);
+  })
+}
+
+module.exports = { getS3List, getUploadPUrl, deleteObject, foundObject }
