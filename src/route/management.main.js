@@ -65,7 +65,7 @@ router.get("/award", async (req, res) => {
       error: "management/main/award : internal server error"
     })
   }
-})
+});
 
 router.get("/award/info/:id", [
   param("id").isMongoId(),
@@ -90,6 +90,30 @@ router.get("/award/info/:id", [
     })
   }
 });
+
+router.post("/award/add", [
+  body("name").matches(patterns.award.name),
+  body("content").matches(patterns.award.content),
+], validator, async (req, res) => {
+  try {
+    const award = new awardModel({
+      name: req.body.name,
+      content: req.body.content,
+      isShow: false,
+      registDate: new Date(),
+    })
+    const awardSaved = await award.save();
+    res.json({
+      award: awardSaved
+    })
+  }
+  catch(e) {
+    console.log(e);
+    return res.status(401).json({
+      error: "management/main/award/add : internal server error"
+    })
+  }
+})
 
 router.post("/award/edit/name", [
   body("id").isMongoId(),
