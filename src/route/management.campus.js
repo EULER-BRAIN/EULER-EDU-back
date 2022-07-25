@@ -1,7 +1,7 @@
 const express = require('express');
 const { teacherModel, noticeModel } = require('../db/mongo');
 const { query, param, body } = require("express-validator");
-const valid = require('../tools/valid');
+const validator = require('../middlewares/validator');
 const patterns = require('../db/regExpPatterns');
 const bkfd2Password = require("pbkdf2-password");
 const hasher = bkfd2Password();
@@ -40,7 +40,7 @@ router.post("/teacher", async (req, res) => {
 
 router.post("/teacher/info", [
   body("id").matches(patterns.loginId),
-], valid(async (req, res) => {
+], validator, async (req, res) => {
   try {
     if (req.loginLevel != 'administrator' && req.loginLevel != 'director') {
       return res.status(402).json({
@@ -65,12 +65,12 @@ router.post("/teacher/info", [
       error: "management/campus/teacher/info : internal server error"
     })
   }
-}));
+});
 
 router.post("/teacher/edit/name", [
   body("id").matches(patterns.loginId),
   body("name").matches(patterns.name),
-], valid(async (req, res) => {
+], validator, async (req, res) => {
   try {
     const teacher = await teacherModel.findOne({
       id: req.body.id
@@ -110,12 +110,12 @@ router.post("/teacher/edit/name", [
       error: "management/campus/teacher/edit/name : internal server error"
     })
   }
-}));
+});
 
 router.post("/teacher/edit/password", [
   body("id").matches(patterns.loginId),
   body("password").matches(patterns.loginPw),
-], valid(async (req, res) => {
+], validator, async (req, res) => {
   try {
     const teacher = await teacherModel.findOne({
       id: req.body.id
@@ -164,11 +164,11 @@ router.post("/teacher/edit/password", [
       error: "management/campus/teacher/edit/password : internal server error"
     })
   }
-}));
+});
 
 router.post("/notice/add", [
   body("title").matches(patterns.noticeTitle),
-], valid(async (req, res) => {
+], validator, async (req, res) => {
   try {
     const dateNow = new Date();
     const author = await teacherModel.findOne({ id: req.loginId }, "_id");
@@ -197,6 +197,6 @@ router.post("/notice/add", [
       error: "management/campus/notice/add : internal server error"
     })
   }
-}));
+});
 
 module.exports = router;

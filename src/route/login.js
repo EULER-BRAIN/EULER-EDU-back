@@ -1,7 +1,7 @@
 const express = require('express');
 const { teacherModel } = require('../db/mongo');
 const { query, param, body } = require("express-validator");
-const valid = require('../tools/valid');
+const validator = require('../middlewares/validator');
 const patterns = require('../db/regExpPatterns');
 const bkfd2Password = require("pbkdf2-password");
 const hasher = bkfd2Password();
@@ -35,7 +35,7 @@ router.get('/getInfo/campus', async (req, res) => {
 router.post('/try/teacher', [
   body("id").matches(patterns.loginId),
   body("pw").matches(patterns.loginPw),
-], valid(async (req, res) => {
+], validator, async (req, res) => {
   const { id, pw } = req.body;
   const teacher = await teacherModel.findOne({ id: id });
   if (!teacher) {
@@ -71,7 +71,7 @@ router.post('/try/teacher', [
       })
     }
   })
-}));
+});
 
 router.get('/logout', (req, res) => {
   logout(req, res, (err) => {

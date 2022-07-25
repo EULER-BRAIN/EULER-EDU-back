@@ -2,7 +2,7 @@ const express = require('express');
 const awsS3 = require('../db/awsS3');
 const { awardModel } = require('../db/mongo');
 const { query, param, body } = require("express-validator");
-const valid = require('../tools/valid');
+const validator = require('../middlewares/validator');
 const patterns = require('../db/regExpPatterns');
 const router = express.Router();
 
@@ -69,7 +69,7 @@ router.get("/award", async (req, res) => {
 
 router.get("/award/info/:id", [
   param("id").isMongoId(),
-], valid(async (req, res) => {
+], validator, async (req, res) => {
   try {
     const id = req.params.id;
     const award = await awardModel.findById(id);
@@ -89,12 +89,12 @@ router.get("/award/info/:id", [
       error: "management/main/award/info/:id : internal server error"
     })
   }
-}));
+});
 
 router.post("/award/edit/name", [
   body("id").isMongoId(),
   body("name").matches(patterns.awardName),
-], valid(async (req, res) => {
+], validator, async (req, res) => {
   try {
     const award = await awardModel.findOneAndUpdate({
       _id: req.body.id
@@ -113,12 +113,12 @@ router.post("/award/edit/name", [
       error: "management/main/award/edit/name : internal server error"
     })
   }
-}));
+});
 
 router.post("/award/edit/content", [
   body("id").isMongoId(),
   body("content").matches(patterns.awardContent),
-], valid(async (req, res) => {
+], validator, async (req, res) => {
   try {
     const award = await awardModel.findOneAndUpdate({
       _id: req.body.id
@@ -137,12 +137,12 @@ router.post("/award/edit/content", [
       error: "management/main/award/edit/content : internal server error"
     })
   }
-}));
+});
 
 router.post("/award/edit/isShow", [
   body("id").isMongoId(),
   body("isShow").isBoolean(),
-], valid(async (req, res) => {
+], validator, async (req, res) => {
   try {
     const award = await awardModel.findOneAndUpdate({
       _id: req.body.id
@@ -161,11 +161,11 @@ router.post("/award/edit/isShow", [
       error: "management/main/award/edit/isShow : internal server error"
     })
   }
-}));
+});
 
 router.get("/award/img/delete/:id", [
   param("id").isMongoId(),
-], valid(async (req, res) => {
+], validator, async (req, res) => {
   try {
     const id = req.params.id;
     const award = await awardModel.findById(id);
@@ -191,11 +191,11 @@ router.get("/award/img/delete/:id", [
       error: "management/main/award/img/delete/:id : internal server error"
     })
   }
-}));
+});
 
 router.get("/award/delete/:id", [
   param("id").isMongoId(),
-], valid(async (req, res) => {
+], validator, async (req, res) => {
   try {
     await awardModel.findByIdAndDelete({ _id: req.params.id });
     res.json({
@@ -208,6 +208,6 @@ router.get("/award/delete/:id", [
       error: "management/main/award/delete/:id : internal server error"
     })
   }
-}));
+});
 
 module.exports = router;
