@@ -217,6 +217,30 @@ router.get("/award/img/delete/:id", [
   }
 });
 
+router.get("/award/img/upload/:id", [
+  param("id").isMongoId(),
+], validator, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const award = await awardModel.findById(id);
+    if (!award) {
+      return res.status(403).json({
+        error: "management/main/award/img/upload/:id : no corresponding teacher"
+      })
+    }
+    const url = awsS3.getUploadPUrl(`awards/${ award._id }.png`);
+    res.json({
+      url: url
+    })
+  }
+  catch(e) {
+    console.log(e);
+    return res.status(401).json({
+      error: "management/main/award/img/upload/:id : internal server error"
+    })
+  }
+})
+
 router.get("/award/delete/:id", [
   param("id").isMongoId(),
 ], validator, async (req, res) => {
