@@ -93,7 +93,7 @@ router.get("/award/info/:id", [
 
 router.post("/award/edit/name", [
   body("id").isMongoId(),
-  body("name").matches(patterns.awardName),
+  body("name").matches(patterns.award.name),
 ], validator, async (req, res) => {
   try {
     const award = await awardModel.findOneAndUpdate({
@@ -117,7 +117,7 @@ router.post("/award/edit/name", [
 
 router.post("/award/edit/content", [
   body("id").isMongoId(),
-  body("content").matches(patterns.awardContent),
+  body("content").matches(patterns.award.content),
 ], validator, async (req, res) => {
   try {
     const award = await awardModel.findOneAndUpdate({

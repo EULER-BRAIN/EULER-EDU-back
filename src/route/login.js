@@ -33,8 +33,8 @@ router.get('/getInfo/campus', async (req, res) => {
 });
 
 router.post('/try/teacher', [
-  body("id").matches(patterns.loginId),
-  body("pw").matches(patterns.loginPw),
+  body("id").matches(patterns.teacher.id),
+  body("pw").matches(patterns.teacher.password),
 ], validator, async (req, res) => {
   const { id, pw } = req.body;
   const teacher = await teacherModel.findOne({ id: id });

@@ -39,7 +39,7 @@ router.post("/teacher", async (req, res) => {
 })
 
 router.post("/teacher/info", [
-  body("id").matches(patterns.loginId),
+  body("id").matches(patterns.teacher.id),
 ], validator, async (req, res) => {
   try {
     if (req.loginLevel != 'administrator' && req.loginLevel != 'director') {
@@ -68,8 +68,8 @@ router.post("/teacher/info", [
 });
 
 router.post("/teacher/edit/name", [
-  body("id").matches(patterns.loginId),
-  body("name").matches(patterns.name),
+  body("id").matches(patterns.teacher.id),
+  body("name").matches(patterns.teacher.name),
 ], validator, async (req, res) => {
   try {
     const teacher = await teacherModel.findOne({
@@ -113,8 +113,8 @@ router.post("/teacher/edit/name", [
 });
 
 router.post("/teacher/edit/password", [
-  body("id").matches(patterns.loginId),
-  body("password").matches(patterns.loginPw),
+  body("id").matches(patterns.teacher.id),
+  body("password").matches(patterns.teacher.password),
 ], validator, async (req, res) => {
   try {
     const teacher = await teacherModel.findOne({
@@ -167,7 +167,7 @@ router.post("/teacher/edit/password", [
 });
 
 router.post("/notice/add", [
-  body("title").matches(patterns.noticeTitle),
+  body("title").matches(patterns.notice.title),
 ], validator, async (req, res) => {
   try {
     const dateNow = new Date();
