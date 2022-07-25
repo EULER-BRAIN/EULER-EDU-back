@@ -79,6 +79,39 @@ router.post("/award/list", [
   }
 });
 
+router.get("/award/content/:id", [
+  param("id").isMongoId()
+], validator, async (req, res) => {
+  try {
+    const award = await awardModel.findById(req.params.id);
+    if (!award || !award.isShow) {
+      return res.status(403).json({
+        error: "main/award/content/:id : no corresponding award"
+      })
+    }
+    const awardPrev = await awardModel.find({
+      isShow: true,
+      registDate: { $gt: award.registDate }
+    }).sort('registDate').limit(1);
+    const awardNext = await awardModel.find({
+      isShow: true,
+      registDate: { $lt: award.registDate }
+    }).sort('-registDate').limit(1);
+    
+    res.json({
+      award: award,
+      awardPrev: awardPrev.length > 0 ? awardPrev[0] : null,
+      awardNext: awardNext.length > 0 ? awardNext[0] : null,
+    })
+  }
+  catch (e) {
+    console.log(e);
+    return res.status(401).json({
+      error: "main/award/content/:id : internal server error"
+    })
+  }
+});
+
 router.get("/notice/content/:id", [
   param("id").isMongoId()
 ], validator, async (req, res) => {
