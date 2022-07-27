@@ -4,18 +4,27 @@ const { awardModel } = require('../db/mongo');
 const { query, param, body } = require("express-validator");
 const validator = require('../middlewares/validator');
 const patterns = require('../db/regExpPatterns');
+const trans = require('../tools/trans');
 const router = express.Router();
 
 router.use(require('../middlewares/authTeacher')('administrator'));
 
-router.get("/award", async (req, res) => {
+router.post("/award", [
+  body("page").isInt({ min: 1 })
+], validator, async (req, res) => {
   try {
-    const awards = await awardModel.find().sort('-registDate isShow');
-    if (!awards) {
-      return res.status(401).json({
-        error: "management/main/award : internal server error"
+    const npp = 50;
+    const page = req.body.page;
+    let awardsAll = await awardModel.find({}, "_id");
+    if (!awardsAll) awardsAll = [];
+    const maxPage = trans.maxPage(awardsAll.length, npp);
+    if (page > maxPage) {
+      return res.status(404).json({
+        error: "management/main/award : out of page scope"
       })
     }
+    let awards = await awardModel.find()
+      .sort('-registDate').limit(npp).skip(npp*(page-1));
     awsS3.getS3List('awards/', (err, awardsS3) => {
       if (err) {
         return res.status(401).json({
@@ -23,7 +32,6 @@ router.get("/award", async (req, res) => {
         })
       }
       const imgList = [];
-      const imgCheck = {};
       awardsS3.Contents.forEach(item => {
         if (!item.Key.startsWith('awards/')) return;
         if (!item.Key.endsWith('.png')) return;
@@ -32,7 +40,6 @@ router.get("/award", async (req, res) => {
       const ret = awards.map(item => {
         const id = item._id.toString();
         const isImg = (imgList.indexOf(id) != -1 ? true : false);
-        if (isImg) imgCheck[id] = true;
         return {
           _id: id,
           name: item.name,
@@ -42,7 +49,7 @@ router.get("/award", async (req, res) => {
           registDate: item.registDate
         }
       })
-      imgList.forEach(item => {
+      /*imgList.forEach(item => {
         if (!imgCheck[item]) {
           ret.push({
             _id: item,
@@ -53,9 +60,11 @@ router.get("/award", async (req, res) => {
             registDate: new Date()
           })
         }
-      })
+      })*/
       return res.json({
-        awards: ret
+        awards: ret,
+        page: page,
+        maxPage: maxPage
       })
     })
   }

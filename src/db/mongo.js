@@ -37,6 +37,7 @@ const bookSchema = Schema({
 const noticeSchema = Schema({
   title: { type: String, default: 'notice-unnamed' },
   content: { type: String, default: '' },
+  link: { type: String, default: '' },
   registDate: { type: Date, required: true },
   modifyDate: { type: Date, required: true },
   isShow: { type: Boolean, default: true },
