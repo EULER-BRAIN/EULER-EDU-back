@@ -5,6 +5,7 @@ const validator = require('../middlewares/validator');
 const patterns = require('../db/regExpPatterns');
 const bkfd2Password = require("pbkdf2-password");
 const hasher = bkfd2Password();
+const trans = require('../tools/trans');
 const router = express.Router();
 
 router.use(require('../middlewares/authTeacherCampus'));
@@ -166,8 +167,50 @@ router.post("/teacher/edit/password", [
   }
 });
 
+router.post("/notice", [
+  body("page").isInt({ min: 1 })
+], validator, async (req, res) => {
+  try {
+    const npp = 50;
+    const page = req.body.page;
+    let noticesAll = await noticeModel.find({ campus: req.campusId }, "_id");
+    if (!noticesAll) noticesAll = [];
+    const maxPage = trans.maxPage(noticesAll.length, npp);
+    if (page > maxPage) {
+      return res.status(404).json({
+        error: "management/campus/notice : out of page scope"
+      })
+    }
+    const notices = await noticeModel.find({ campus: req.campusId }, "_id title link registDate modifyDate isShow author")
+      .sort('-registDate').limit(npp).skip(npp*(page-1));
+    for (let i = 0; i < notices.length; i++) {
+      const author = await teacherModel.findById(notices[i].author, "_id name");
+      if (!author) {
+        return res.status(405).json({
+          error: "management/campus/notice : contradiction on database"
+        })
+      }
+      notices[i].author = author;
+    }
+    res.json({
+      notices,
+      page,
+      maxPage
+    })
+  }
+  catch (e) {
+    console.log(e);
+    return res.status(401).json({
+      error: "management/campus/notice : internal server error"
+    })
+  }
+})
+
 router.post("/notice/add", [
   body("title").matches(patterns.notice.title),
+  body("content").isString(),
+  body("link").matches(patterns.notice.link),
+  body("isShow").isBoolean(),
 ], validator, async (req, res) => {
   try {
     const dateNow = new Date();
@@ -180,9 +223,10 @@ router.post("/notice/add", [
     const notice = new noticeModel({
       title: req.body.title,
       content: req.body.content,
+      link: req.body.link,
       registDate: dateNow,
       modifyDate: dateNow,
-      isShow: true,
+      isShow: req.body.isShow,
       campus: req.campusId,
       author: author._id
     });

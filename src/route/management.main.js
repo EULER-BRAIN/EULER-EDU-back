@@ -23,7 +23,7 @@ router.post("/award", [
         error: "management/main/award : out of page scope"
       })
     }
-    let awards = await awardModel.find()
+    const awards = await awardModel.find()
       .sort('-registDate').limit(npp).skip(npp*(page-1));
     awsS3.getS3List('awards/', (err, awardsS3) => {
       if (err) {

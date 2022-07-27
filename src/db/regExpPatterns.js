@@ -5,6 +5,7 @@ module.exports = {
   },
   notice: {
     title: RegExp("^.{1,40}$"),
+    link: RegExp("^.{0,100}$"),
   },
   teacher: {
     id: RegExp("^[a-z0-9_-]{5,20}$"),
