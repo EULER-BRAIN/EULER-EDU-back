@@ -34,7 +34,7 @@ router.get("/:cid", validator, async (req, res) => {
     const notices = await noticeModel.find({
       campus: campus._id,
       isShow: true
-    }, "_id title modifyDate").sort("-modifyDate").limit(5);
+    }, "_id title link modifyDate").sort("-modifyDate").limit(5);
     return res.json({
       campus,
       notices,
