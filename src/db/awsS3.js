@@ -18,17 +18,39 @@ const getS3List = (directoryPath, cb) => {
   });
 }
 
-// function to generate signed-url for upload
-const getUploadPUrl = (filePath) => {
+// function to generate signed-url for upload(PUT)
+const getUploadPUrlPut = (filePath, fileType='image/png') => {
   const presignedUrl = s3.getSignedUrl('putObject', {
     Bucket: env.aws.s3BucketName,
     Key: filePath,
-    ContentType: 'image/png',
+    ContentType: fileType,
     ACL: 'public-read',
     Expires: 60, // 1 min
   });
   return presignedUrl;
 }
+
+// function to generate signed-url for upload(POST)
+const getUploadPUrlPost = (filePath, fileType, cb) => {
+  s3.createPresignedPost(
+    {
+      Bucket: env.aws.s3BucketName,
+      Expires: 60, // 1 min
+      Conditions: [
+        { key: filePath },
+        { acl: 'public-read' },
+        ["eq", "$Content-Type", fileType],
+        ["content-length-range", 1, 10 * 1024 * 1024], // Maximum file size is 10MB
+      ],
+      Fields: {
+        acl: "public-read",
+      }
+    },
+    (err, data) => {
+      cb(err, data);
+    }
+  );
+};
 
 // function to delete object
 const deleteObject = (filePath, cb) => {
@@ -50,4 +72,4 @@ const foundObject = (filePath, cb) => {
   })
 }
 
-module.exports = { getS3List, getUploadPUrl, deleteObject, foundObject }
+module.exports = { getS3List, getUploadPUrlPut, getUploadPUrlPost, deleteObject, foundObject }

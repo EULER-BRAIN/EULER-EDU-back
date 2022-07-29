@@ -12,4 +12,5 @@ module.exports = {
     password: RegExp("^.{10,30}$"),
     name: RegExp("^[A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ0-9-_ ]{2,15}$"),
   },
+  imgType : RegExp("^(image/png|image/jpg|image/jpeg)$"),
 }

@@ -226,26 +226,38 @@ router.get("/award/img/delete/:id", [
   }
 });
 
-router.get("/award/img/upload/:id", [
-  param("id").isMongoId(),
+router.post("/award/img/upload", [
+  body("id").isMongoId(),
+  body("type").matches(patterns.imgType),
 ], validator, async (req, res) => {
   try {
-    const id = req.params.id;
-    const award = await awardModel.findById(id);
+    const award = await awardModel.findById(req.body.id);
     if (!award) {
       return res.status(403).json({
-        error: "management/main/award/img/upload/:id : no corresponding teacher"
+        error: "management/main/award/img/upload : no corresponding award"
       })
     }
-    const url = awsS3.getUploadPUrl(`awards/${ award._id }`);
-    res.json({
-      url: url
+    
+    const key = `awards/${ award._id }`;
+    const type = req.body.type;
+    awsS3.getUploadPUrlPost(key, type, (err, data) => {
+      if (err) {
+        return res.status(500).json({
+          error: "internal server error"
+        })
+      }
+      data.fields["Content-Type"] = type;
+      data.fields["key"] = key;
+      res.json({
+        url: data.url,
+        fields: data.fields,
+      })
     })
   }
   catch(e) {
     console.log(e);
     return res.status(401).json({
-      error: "management/main/award/img/upload/:id : internal server error"
+      error: "management/main/award/img/upload : internal server error"
     })
   }
 })
