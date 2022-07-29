@@ -34,7 +34,7 @@ router.post("/award", [
       const imgList = [];
       awardsS3.Contents.forEach(item => {
         if (!item.Key.startsWith('awards/')) return;
-        if (!item.Key.endsWith('.png')) return;
+        if (item.Key == 'awards/') return;
         imgList.push(item.Key.slice(7, -4))
       })
       const ret = awards.map(item => {
@@ -87,7 +87,7 @@ router.get("/award/info/:id", [
         error: "management/main/award/info/:id : no corresponding teacher"
       })
     }
-    awsS3.foundObject(`awards/${ award._id }.png`, (err, data) => {
+    awsS3.foundObject(`awards/${ award._id }`, (err, data) => {
       const imgFound = (err ? false : true);
       res.json({ award, imgFound })
     })
@@ -207,7 +207,7 @@ router.get("/award/img/delete/:id", [
         error: "management/main/award/img/delete/:id : no corresponding teacher"
       })
     }
-    awsS3.deleteObject(`awards/${ award._id }.png`, (err, data) => {
+    awsS3.deleteObject(`awards/${ award._id }`, (err, data) => {
       if (err) {
         return res.status(401).json({
           error: "management/main/award/img/delete/:id : internal server error"
@@ -237,7 +237,7 @@ router.get("/award/img/upload/:id", [
         error: "management/main/award/img/upload/:id : no corresponding teacher"
       })
     }
-    const url = awsS3.getUploadPUrl(`awards/${ award._id }.png`);
+    const url = awsS3.getUploadPUrl(`awards/${ award._id }`);
     res.json({
       url: url
     })
