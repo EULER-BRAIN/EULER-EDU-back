@@ -278,7 +278,17 @@ router.get("/award/delete/:id", [
     await awardModel.findByIdAndDelete({ _id: req.params.id });
     res.json({
       result: true
-    })
+    });
+
+    awsS3.foundObject(`awards/${ req.params.id }`, (err, data) => {
+      if (!err) {
+        awsS3.deleteObject(`awards/${ req.params.id }`, (err, data) => {
+          if (err) {
+            console.log(err)
+          }
+        });
+      }
+    });
   }
   catch(e) {
     console.log(e);

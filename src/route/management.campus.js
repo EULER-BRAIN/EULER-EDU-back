@@ -305,7 +305,7 @@ router.get("/poster/info/:id", [
     awsS3.foundObject(`posters/${ poster._id }`, (err, data) => {
       const imgFound = (err ? false : true);
       res.json({ poster, imgFound })
-    })
+    });
   }
   catch (e) {
     console.log(e);
@@ -511,7 +511,17 @@ router.post("/poster/delete", [
     await posterModel.findByIdAndDelete(req.body.id);
     res.json({
       result: true
-    })
+    });
+
+    awsS3.foundObject(`posters/${ req.body.id }`, (err, data) => {
+      if (!err) {
+        awsS3.deleteObject(`posters/${ req.body.id }`, (err, data) => {
+          if (err) {
+            console.log(err)
+          }
+        });
+      }
+    });
   }
   catch(e) {
     console.log(e);
