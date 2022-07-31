@@ -9,6 +9,7 @@ const hasher = bkfd2Password();
 const trans = require('../tools/trans');
 const router = express.Router();
 
+const middlewareAuthTeacher = require("../middlewares/authTeacherCampus.teacher");
 const middlewareAuthPoster = require("../middlewares/authTeacherCampus.poster");
 router.use(require('../middlewares/authTeacherCampus'));
 
@@ -75,29 +76,9 @@ router.post("/teacher/edit/name", [
   body("id").matches(patterns.teacher.id),
   body("name").matches(patterns.teacher.name),
   validator,
+  middlewareAuthTeacher,
 ], async (req, res) => {
   try {
-    const teacher = await teacherModel.findOne({
-      id: req.body.id
-    });
-    if (!teacher) {
-      return res.status(404).json({
-        error: "no corresponding teacher"
-      });
-    }
-    if (teacher.campus.toString() != req.campusId.toString()) {
-      return res.status(401).json({
-        error: "permission denied"
-      });
-    }
-    if (req.loginLevel != 'administrator' && req.loginLevel == 'director') {
-      if (req.body.id != req.loginId) {
-        return res.status(401).json({
-          error: "permission denied"
-        });
-      }
-    }
-
     const teacherAfter = await teacherModel.findOneAndUpdate({
       id: req.body.id
     }, {
@@ -121,29 +102,9 @@ router.post("/teacher/edit/password", [
   body("id").matches(patterns.teacher.id),
   body("password").matches(patterns.teacher.password),
   validator,
+  middlewareAuthTeacher,
 ], async (req, res) => {
   try {
-    const teacher = await teacherModel.findOne({
-      id: req.body.id
-    });
-    if (!teacher) {
-      return res.status(404).json({
-        error: "no corresponding teacher"
-      });
-    }
-    if (teacher.campus.toString() != req.campusId.toString()) {
-      return res.status(401).json({
-        error: "permission denied"
-      });
-    }
-    if (req.loginLevel != 'administrator' && req.loginLevel == 'director') {
-      if (req.body.id != req.loginId) {
-        return res.status(401).json({
-          error: "permission denied"
-        });
-      }
-    }
-
     hasher({ password: req.body.password }, async (err, pass, salt, hash) => {
       if (err) {
         console.log(err);
@@ -151,6 +112,7 @@ router.post("/teacher/edit/password", [
           error: "internal server error"
         });
       }
+      
       const teacherAfter = await teacherModel.findOneAndUpdate({
         id: req.body.id
       }, {

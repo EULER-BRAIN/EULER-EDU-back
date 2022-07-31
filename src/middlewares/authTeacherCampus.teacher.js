@@ -1,32 +1,25 @@
-const { teacherModel, posterModel } = require('../db/mongo');
+const { teacherModel } = require('../db/mongo');
 
 module.exports = async (req, res, next) => {
   try {
+    const teacherId = req.body.id || req.query.id || req.params.id;
     const teacher = await teacherModel.findOne({
-      id: req.loginId
-    }, "_id");
+      id: teacherId,
+    }, "_id campus");
     if (!teacher) {
-      return res.status(500).json({
-        error: "internal server error"
-      });
-    }
-
-    const posterId = req.body.id || req.query.id || req.params.id;
-    const poster = await posterModel.findById(posterId, "author campus");
-    if (!poster) {
       return res.status(404).json({
-        error: "no corresponding poster"
+        error: "no corresponding teacher"
       });
     }
 
-    if (poster.campus.toString() != req.campusId.toString()) {
+    if (teacher.campus.toString() != req.campusId.toString()) {
       return res.status(401).json({
         error: "permission denied"
       });
     }
 
     if (req.loginLevel != 'administrator' && req.loginLevel == 'director') {
-      if (poster.author.toString() != teacher._id.toString()) {
+      if (teacherId != req.loginId) {
         return res.status(401).json({
           error: "permission denied"
         });
