@@ -238,11 +238,40 @@ router.post("/poster", [
       }
       posters[i].author = author;
     }
-    res.json({
-      posters,
-      page,
-      maxPage
-    })
+
+    awsS3.getS3List('posters/', (err, postersS3) => {
+      if (err) {
+        return res.status(500).json({
+          error: "internal server error"
+        });
+      }
+      const imgList = [];
+      postersS3.Contents.forEach(item => {
+        if (!item.Key.startsWith('posters/')) return;
+        if (item.Key == 'posters/') return;
+        imgList.push(item.Key.slice(8))
+      })
+      const ret = posters.map(item => {
+        const isImg = (imgList.indexOf(item._id.toString()) != -1 ? true : false);
+        return {
+          _id: item._id,
+          title: item.title,
+          content: item.content,
+          link: item.link,
+          registDate: item.registDate,
+          isShow: item.isShow,
+          campus: item.campus,
+          author: item.author,
+          isImg: isImg,
+        }
+      });
+
+      return res.json({
+        posters: ret,
+        page,
+        maxPage
+      })
+    });
   }
   catch (e) {
     console.log(e);

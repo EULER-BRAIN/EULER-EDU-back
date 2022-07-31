@@ -36,7 +36,7 @@ router.post("/award", [
       awardsS3.Contents.forEach(item => {
         if (!item.Key.startsWith('awards/')) return;
         if (item.Key == 'awards/') return;
-        imgList.push(item.Key.slice(7, -4))
+        imgList.push(item.Key.slice(7))
       })
       const ret = awards.map(item => {
         const id = item._id.toString();
