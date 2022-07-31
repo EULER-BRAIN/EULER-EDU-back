@@ -12,7 +12,7 @@ module.exports = async (req, res, next) => {
     }
 
     const posterId = req.body.id || req.query.id || req.params.id;
-    const poster = await posterModel.findById(posterId, "author campus");
+    const poster = await posterModel.findById(posterId);
     if (!poster) {
       return res.status(404).json({
         error: "no corresponding poster"
@@ -33,6 +33,7 @@ module.exports = async (req, res, next) => {
       }
     }
 
+    req.poster = poster;
     next();
   }
   catch (e) {

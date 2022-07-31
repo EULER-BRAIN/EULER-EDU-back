@@ -40,7 +40,7 @@ router.post("/teacher", async (req, res) => {
       error: "internal server error"
     });
   }
-})
+});
 
 router.post("/teacher/info", [
   body("id").matches(patterns.teacher.id),
@@ -112,7 +112,7 @@ router.post("/teacher/edit/password", [
           error: "internal server error"
         });
       }
-      
+
       const teacherAfter = await teacherModel.findOneAndUpdate({
         id: req.body.id
       }, {
@@ -320,7 +320,95 @@ router.post("/poster/add", [
       error: "internal server error"
     });
   }
-})
+});
+
+router.post("/poster/edit/title", [
+  body("id").isMongoId(),
+  body("title").matches(patterns.poster.title),
+  validator,
+  middlewareAuthPoster,
+], async (req, res) => {
+  try {
+    const poster = await posterModel.findByIdAndUpdate(req.body.id, {
+      title: req.body.title
+    }, {
+      new: true
+    });
+    res.json({ poster });
+  }
+  catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      error: "internal server error"
+    });
+  }
+});
+
+router.post("/poster/edit/content", [
+  body("id").isMongoId(),
+  body("content").matches(patterns.poster.content),
+  validator,
+  middlewareAuthPoster,
+], async (req, res) => {
+  try {
+    const poster = await posterModel.findByIdAndUpdate(req.body.id, {
+      content: req.body.content
+    }, {
+      new: true
+    });
+    res.json({ poster });
+  }
+  catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      error: "internal server error"
+    });
+  }
+});
+
+router.post("/poster/edit/link", [
+  body("id").isMongoId(),
+  body("link").matches(patterns.poster.link),
+  validator,
+  middlewareAuthPoster,
+], async (req, res) => {
+  try {
+    const poster = await posterModel.findByIdAndUpdate(req.body.id, {
+      link: req.body.link
+    }, {
+      new: true
+    });
+    res.json({ poster });
+  }
+  catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      error: "internal server error"
+    });
+  }
+});
+
+router.post("/poster/edit/isShow", [
+  body("id").isMongoId(),
+  body("isShow").isBoolean(),
+  validator,
+  middlewareAuthPoster,
+], async (req, res) => {
+  try {
+    const poster = await posterModel.findByIdAndUpdate(req.body.id, {
+      isShow: req.body.isShow
+    }, {
+      new: true
+    });
+    res.json({ poster });
+  }
+  catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      error: "internal server error"
+    });
+  }
+});
 
 router.post("/poster/img/upload", [
   body("id").isMongoId(),
@@ -358,6 +446,50 @@ router.post("/poster/img/upload", [
       error: "internal server error"
     });
   }
-})
+});
+
+router.post("/poster/img/delete", [
+  body("id").isMongoId(),
+  validator,
+  middlewareAuthPoster,
+], async (req, res) => {
+  try {
+    awsS3.deleteObject(`posters/${ req.body.id }`, (err, data) => {
+      if (err) {
+        return res.status(500).json({
+          error: "internal server error"
+        });
+      }
+      res.json({
+        poster: req.poster
+      })
+    })
+  }
+  catch(e) {
+    console.log(e);
+    return res.status(500).json({
+      error: "internal server error"
+    });
+  }
+});
+
+router.post("/poster/delete", [
+  body("id").isMongoId(),
+  validator,
+  middlewareAuthPoster,
+], async (req, res) => {
+  try {
+    await posterModel.findByIdAndDelete(req.body.id);
+    res.json({
+      result: true
+    })
+  }
+  catch(e) {
+    console.log(e);
+    return res.status(500).json({
+      error: "internal server error"
+    });
+  }
+});
 
 module.exports = router;
