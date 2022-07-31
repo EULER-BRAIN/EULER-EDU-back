@@ -1,5 +1,5 @@
 const express = require('express');
-const { galleryModel, campusModel, awardModel, bookModel, noticeModel, teacherModel } = require("../db/mongo");
+const { galleryModel, campusModel, awardModel, bookModel, noticeModel, teacherModel, posterModel } = require("../db/mongo");
 const { query, param, body } = require("express-validator");
 const validator = require('../middlewares/validator');
 const trans = require('../tools/trans');
@@ -35,9 +35,16 @@ router.get("/:cid", async (req, res) => {
       campus: campus._id,
       isShow: true
     }, "_id title link modifyDate").sort("-modifyDate").limit(5);
+
+    const posters = await posterModel.find({
+      campus: campus._id,
+      isShow: true
+    }, "_id title content link registDate author").sort("-registDate").limit(20);
+
     return res.json({
       campus,
       notices,
+      posters,
       dateNow: new Date()
     });
   }
