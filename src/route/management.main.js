@@ -19,8 +19,8 @@ router.post("/award", [
     if (!awardsAll) awardsAll = [];
     const maxPage = trans.maxPage(awardsAll.length, npp);
     if (page > maxPage) {
-      return res.status(404).json({
-        error: "management/main/award : out of page scope"
+      return res.status(416).json({
+        error: "out of page scope"
       })
     }
     const awards = await awardModel.find()

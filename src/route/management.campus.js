@@ -1,5 +1,5 @@
 const express = require('express');
-const { teacherModel, noticeModel } = require('../db/mongo');
+const { teacherModel, noticeModel, posterModel } = require('../db/mongo');
 const { query, param, body } = require("express-validator");
 const validator = require('../middlewares/validator');
 const patterns = require('../db/regExpPatterns');
@@ -177,8 +177,8 @@ router.post("/notice", [
     if (!noticesAll) noticesAll = [];
     const maxPage = trans.maxPage(noticesAll.length, npp);
     if (page > maxPage) {
-      return res.status(404).json({
-        error: "management/campus/notice : out of page scope"
+      return res.status(416).json({
+        error: "out of page scope"
       })
     }
     const notices = await noticeModel.find({ campus: req.campusId }, "_id title link registDate modifyDate isShow author")
@@ -242,5 +242,79 @@ router.post("/notice/add", [
     })
   }
 });
+
+router.post("/poster", [
+  body("page").isInt({ min: 1 })
+], validator, async (req, res) => {
+  try {
+    const npp = 50;
+    const page = req.body.page;
+    let postersAll = await posterModel.find({ campus: req.campusId }, "_id");
+    if (!postersAll) postersAll = [];
+    const maxPage = trans.maxPage(postersAll.length, npp);
+    if (page > maxPage) {
+      return res.status(416).json({
+        error: "out of page scope"
+      })
+    }
+    const posters = await posterModel.find({ campus: req.campusId })
+      .sort('-registDate').limit(npp).skip(npp*(page-1));
+    for (let i = 0; i < posters.length; i++) {
+      const author = await teacherModel.findById(posters[i].author, "_id name");
+      if (!author) {
+        return res.status(409).json({
+          error: "conflict on database"
+        })
+      }
+      posters[i].author = author;
+    }
+    res.json({
+      posters,
+      page,
+      maxPage
+    })
+  }
+  catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      error: "internal server error"
+    })
+  }
+});
+
+router.post("/poster/add", [
+  body("title").matches(patterns.poster.title),
+  body("content").matches(patterns.poster.content),
+  body("link").matches(patterns.poster.link),
+], validator, async (req, res) => {
+  try {
+    const author = await teacherModel.findOne({ id: req.loginId }, "_id");
+    if (!author) {
+      return res.status(500).json({
+        error: "internal server error"
+      })
+    }
+
+    const poster = new posterModel({
+      title: req.body.title,
+      content: req.body.content,
+      link: req.body.link,
+      registDate: new Date(),
+      isShow: false,
+      campus: req.campusId,
+      author: author._id
+    })
+    const posterSaved = await poster.save();
+    res.json({
+      poster: posterSaved
+    })
+  }
+  catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      error: "internal server error"
+    })
+  }
+})
 
 module.exports = router;

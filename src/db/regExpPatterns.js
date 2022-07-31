@@ -7,6 +7,11 @@ module.exports = {
     title: RegExp("^.{1,40}$"),
     link: RegExp("^.{0,100}$"),
   },
+  poster: {
+    title: RegExp("^.{1,30}$"),
+    content: RegExp("^.{1,50}$"),
+    link: RegExp("^.{1,100}$"),
+  },
   teacher: {
     id: RegExp("^[a-z0-9_-]{5,20}$"),
     password: RegExp("^.{10,30}$"),

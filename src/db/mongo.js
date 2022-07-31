@@ -42,7 +42,16 @@ const noticeSchema = Schema({
   modifyDate: { type: Date, required: true },
   isShow: { type: Boolean, default: true },
   campus: { type: Schema.Types.ObjectId, ref: "Campus", required: true },
-  author: { type: Schema.Types.ObjectId, ref: "Teacher", required: true }
+  author: { type: Schema.Types.ObjectId, ref: "Teacher", required: true },
+});
+const posterSchema = Schema({
+  title: { type: String, default: 'poster-unnamed' },
+  content: { type: String, default: '' },
+  link: { type: String, default: '' },
+  registDate: { type: Date, required: true },
+  isShow: { type: Boolean, default: true },
+  campus: { type: Schema.Types.ObjectId, ref: "Campus", required: true },
+  author: { type: Schema.Types.ObjectId, ref: "Teacher", required: true },
 });
 const teacherSchema = Schema({
   level: { type: String, default: 'teacher' },
@@ -115,5 +124,6 @@ module.exports = {
   awardModel: mongoose.model("Award", awardSchema),
   bookModel: mongoose.model("Book", bookSchema),
   noticeModel: mongoose.model("Notice", noticeSchema),
+  posterModel: mongoose.model("Poster", posterSchema),
   teacherModel: mongoose.model("Teacher", teacherSchema),
 };
