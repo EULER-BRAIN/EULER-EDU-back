@@ -1,5 +1,6 @@
 const express = require('express');
 const { teacherModel, noticeModel, posterModel } = require('../db/mongo');
+const awsS3 = require('../db/awsS3');
 const { query, param, body } = require("express-validator");
 const validator = require('../middlewares/validator');
 const patterns = require('../db/regExpPatterns');
@@ -8,6 +9,7 @@ const hasher = bkfd2Password();
 const trans = require('../tools/trans');
 const router = express.Router();
 
+const middlewareAuthPoster = require("../middlewares/authTeacherCampus.poster");
 router.use(require('../middlewares/authTeacherCampus'));
 
 router.post("/teacher", async (req, res) => {
@@ -282,6 +284,39 @@ router.post("/poster", [
   }
 });
 
+router.get("/poster/info/:id", [
+  param("id").isMongoId(),
+], validator, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const poster = await posterModel.findById(id);
+    if (!poster) {
+      return res.status(404).json({
+        error: "no corresponding poster"
+      })
+    }
+
+    const author = await teacherModel.findById(poster.author, "_id name");
+    if(!author) {
+      return res.status(409).json({
+        error: "conflict on database"
+      })
+    }
+    poster.author = author;
+
+    awsS3.foundObject(`posters/${ poster._id }`, (err, data) => {
+      const imgFound = (err ? false : true);
+      res.json({ poster, imgFound })
+    })
+  }
+  catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      error: "internal server error"
+    })
+  }
+});
+
 router.post("/poster/add", [
   body("title").matches(patterns.poster.title),
   body("content").matches(patterns.poster.content),
@@ -307,6 +342,44 @@ router.post("/poster/add", [
     const posterSaved = await poster.save();
     res.json({
       poster: posterSaved
+    })
+  }
+  catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      error: "internal server error"
+    })
+  }
+})
+
+router.post("/poster/img/upload", [
+  body("id").isMongoId(),
+  body("type").matches(patterns.imgType),
+  validator,
+  middlewareAuthPoster,
+], async (req, res) => {
+  try {
+    const poster = await posterModel.findById(req.body.id, "_id");
+    if (!poster) {
+      return res.status(404).json({
+        error: "no corresponding poster"
+      })
+    }
+
+    const key = `posters/${ poster._id }`;
+    const type = req.body.type;
+    awsS3.getUploadPUrlPost(key, type, (err, data) => {
+      if (err) {
+        return res.status(500).json({
+          error: "internal server error"
+        })
+      }
+      data.fields["Content-Type"] = type;
+      data.fields["key"] = key;
+      res.json({
+        url: data.url,
+        fields: data.fields,
+      })
     })
   }
   catch (e) {
