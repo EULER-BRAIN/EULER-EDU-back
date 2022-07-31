@@ -112,6 +112,50 @@ router.get("/award/content/:id", [
   }
 });
 
+router.post("/notice/list", [
+  body("id").isString(),
+  body("page").isInt({ min: 1 })
+], validator, async (req, res) => {
+  try {
+    const campus = await campusModel.findOne({ id: req.body.id }, "_id");
+    if (!campus) {
+      return res.status(400).json({
+        error: "no corresponding campus"
+      });
+    }
+
+    const npp = 50;
+    const page = req.body.page;
+    let noticeAll = await noticeModel.find({ isShow: true, campus: campus._id }, "_id");
+    if (!noticeAll) noticeAll = [];
+    const maxPage = trans.maxPage(noticeAll.length, npp);
+    if (page > maxPage) {
+      return res.status(416).json({
+        error: "out of page scope"
+      })
+    }
+
+    const notices = await noticeModel.find({
+      isShow: true, campus: campus._id
+    }, "_id title link modifyDate").sort("-modifyDate")
+      .limit(npp).skip(npp*(page-1));
+    const dateNow = new Date();
+    
+    res.json({
+      notices,
+      page,
+      maxPage,
+      dateNow,
+    })
+  }
+  catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      error: "internal server error"
+    })
+  }
+});
+
 router.get("/notice/content/:id", [
   param("id").isMongoId()
 ], validator, async (req, res) => {
