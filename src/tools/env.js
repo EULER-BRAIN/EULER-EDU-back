@@ -6,7 +6,10 @@ module.exports.port = {
   dev: process.env.DEVELOP,
 }
 
-module.exports.mongo = process.env.DB_PATH;
+module.exports.mongo = {
+  path: process.env.DB_PATH,
+  databaseName: process.env.DB_DB,
+}
 module.exports.session = process.env.SESSION_KEY;
 
 module.exports.aws = {

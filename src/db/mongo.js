@@ -46,12 +46,13 @@ const noticeSchema = Schema({
 });
 const teacherSchema = Schema({
   level: { type: String, default: 'teacher' },
+  // administrator | director | teacher
   id: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   salt: { type: String, required: true },
   name: { type: String, default: 'teacher-unnamed' },
   campus: { type: Schema.Types.ObjectId, ref: "Campus", required: true },
-  // administrator | director | teacher
+  lastLogin: { type: Date, default: null },
 });
 const parentSchema = Schema({
   name: { type: String, default: 'parent-unnamed' },
@@ -94,14 +95,16 @@ database.on("error", (err) => {
 });
 database.on("disconnected", () => {
   console.log("데이터베이스와 연결이 끊어졌습니다!");
-  mongoose.connect(env.mongo, {
+  mongoose.connect(env.mongo.path, {
+    dbName: env.mongo.databaseName,
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
 });
 
 /* connect with database */
-mongoose.connect(env.mongo, {
+mongoose.connect(env.mongo.path, {
+  dbName: env.mongo.databaseName,
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
