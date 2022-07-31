@@ -43,7 +43,8 @@ router.post("/teacher", async (req, res) => {
 
 router.post("/teacher/info", [
   body("id").matches(patterns.teacher.id),
-], validator, async (req, res) => {
+  validator,
+], async (req, res) => {
   try {
     if (req.loginLevel != 'administrator' && req.loginLevel != 'director') {
       return res.status(402).json({
@@ -73,7 +74,8 @@ router.post("/teacher/info", [
 router.post("/teacher/edit/name", [
   body("id").matches(patterns.teacher.id),
   body("name").matches(patterns.teacher.name),
-], validator, async (req, res) => {
+  validator,
+], async (req, res) => {
   try {
     const teacher = await teacherModel.findOne({
       id: req.body.id
@@ -118,7 +120,8 @@ router.post("/teacher/edit/name", [
 router.post("/teacher/edit/password", [
   body("id").matches(patterns.teacher.id),
   body("password").matches(patterns.teacher.password),
-], validator, async (req, res) => {
+  validator,
+], async (req, res) => {
   try {
     const teacher = await teacherModel.findOne({
       id: req.body.id
@@ -170,8 +173,9 @@ router.post("/teacher/edit/password", [
 });
 
 router.post("/notice", [
-  body("page").isInt({ min: 1 })
-], validator, async (req, res) => {
+  body("page").isInt({ min: 1 }),
+  validator,
+], async (req, res) => {
   try {
     const npp = 50;
     const page = req.body.page;
@@ -213,7 +217,8 @@ router.post("/notice/add", [
   body("content").isString(),
   body("link").matches(patterns.notice.link),
   body("isShow").isBoolean(),
-], validator, async (req, res) => {
+  validator,
+], async (req, res) => {
   try {
     const dateNow = new Date();
     const author = await teacherModel.findOne({ id: req.loginId }, "_id");
@@ -246,8 +251,9 @@ router.post("/notice/add", [
 });
 
 router.post("/poster", [
-  body("page").isInt({ min: 1 })
-], validator, async (req, res) => {
+  body("page").isInt({ min: 1 }),
+  validator,
+], async (req, res) => {
   try {
     const npp = 50;
     const page = req.body.page;
@@ -286,7 +292,8 @@ router.post("/poster", [
 
 router.get("/poster/info/:id", [
   param("id").isMongoId(),
-], validator, async (req, res) => {
+  validator,
+], async (req, res) => {
   try {
     const id = req.params.id;
     const poster = await posterModel.findById(id);
@@ -321,7 +328,8 @@ router.post("/poster/add", [
   body("title").matches(patterns.poster.title),
   body("content").matches(patterns.poster.content),
   body("link").matches(patterns.poster.link),
-], validator, async (req, res) => {
+  validator,
+], async (req, res) => {
   try {
     const author = await teacherModel.findOne({ id: req.loginId }, "_id");
     if (!author) {

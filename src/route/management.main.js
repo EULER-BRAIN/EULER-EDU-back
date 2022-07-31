@@ -10,8 +10,9 @@ const router = express.Router();
 router.use(require('../middlewares/authTeacher')('administrator'));
 
 router.post("/award", [
-  body("page").isInt({ min: 1 })
-], validator, async (req, res) => {
+  body("page").isInt({ min: 1 }),
+  validator,
+], async (req, res) => {
   try {
     const npp = 50;
     const page = req.body.page;
@@ -78,7 +79,8 @@ router.post("/award", [
 
 router.get("/award/info/:id", [
   param("id").isMongoId(),
-], validator, async (req, res) => {
+  validator,
+], async (req, res) => {
   try {
     const id = req.params.id;
     const award = await awardModel.findById(id);
@@ -103,7 +105,8 @@ router.get("/award/info/:id", [
 router.post("/award/add", [
   body("name").matches(patterns.award.name),
   body("content").matches(patterns.award.content),
-], validator, async (req, res) => {
+  validator,
+], async (req, res) => {
   try {
     const award = new awardModel({
       name: req.body.name,
@@ -127,7 +130,8 @@ router.post("/award/add", [
 router.post("/award/edit/name", [
   body("id").isMongoId(),
   body("name").matches(patterns.award.name),
-], validator, async (req, res) => {
+  validator,
+], async (req, res) => {
   try {
     const award = await awardModel.findOneAndUpdate({
       _id: req.body.id
@@ -151,7 +155,8 @@ router.post("/award/edit/name", [
 router.post("/award/edit/content", [
   body("id").isMongoId(),
   body("content").matches(patterns.award.content),
-], validator, async (req, res) => {
+  validator,
+], async (req, res) => {
   try {
     const award = await awardModel.findOneAndUpdate({
       _id: req.body.id
@@ -175,7 +180,8 @@ router.post("/award/edit/content", [
 router.post("/award/edit/isShow", [
   body("id").isMongoId(),
   body("isShow").isBoolean(),
-], validator, async (req, res) => {
+  validator,
+], async (req, res) => {
   try {
     const award = await awardModel.findOneAndUpdate({
       _id: req.body.id
@@ -198,7 +204,8 @@ router.post("/award/edit/isShow", [
 
 router.get("/award/img/delete/:id", [
   param("id").isMongoId(),
-], validator, async (req, res) => {
+  validator,
+], async (req, res) => {
   try {
     const id = req.params.id;
     const award = await awardModel.findById(id);
@@ -229,7 +236,8 @@ router.get("/award/img/delete/:id", [
 router.post("/award/img/upload", [
   body("id").isMongoId(),
   body("type").matches(patterns.imgType),
-], validator, async (req, res) => {
+  validator,
+], async (req, res) => {
   try {
     const award = await awardModel.findById(req.body.id);
     if (!award) {
@@ -264,7 +272,8 @@ router.post("/award/img/upload", [
 
 router.get("/award/delete/:id", [
   param("id").isMongoId(),
-], validator, async (req, res) => {
+  validator,
+], async (req, res) => {
   try {
     await awardModel.findByIdAndDelete({ _id: req.params.id });
     res.json({

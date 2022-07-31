@@ -1,6 +1,6 @@
 const express = require('express');
 const { teacherModel } = require('../db/mongo');
-const { query, param, body } = require("express-validator");
+const { body } = require("express-validator");
 const validator = require('../middlewares/validator');
 const patterns = require('../db/regExpPatterns');
 const bkfd2Password = require("pbkdf2-password");
@@ -35,7 +35,8 @@ router.get('/getInfo/campus', async (req, res) => {
 router.post('/try/teacher', [
   body("id").matches(patterns.teacher.id),
   body("pw").matches(patterns.teacher.password),
-], validator, async (req, res) => {
+  validator,
+], async (req, res) => {
   const { id, pw } = req.body;
   const teacher = await teacherModel.findOne({ id: id });
   if (!teacher) {

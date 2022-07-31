@@ -5,7 +5,7 @@ const validator = require('../middlewares/validator');
 const trans = require('../tools/trans');
 const router = express.Router();
 
-router.get("/", validator, async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const galleries = await galleryModel.find({ isShow: true }).sort({ modifyDate: -1 });
     const campuses = await campusModel.find({ isShow: true }, "id name subname").sort({ priority: -1 });
@@ -21,7 +21,7 @@ router.get("/", validator, async (req, res) => {
   }
 });
 
-router.get("/:cid", validator, async (req, res) => {
+router.get("/:cid", async (req, res) => {
   try {
     const campus = await campusModel.findOne({
       id: req.params.cid, isShow: true
@@ -50,8 +50,9 @@ router.get("/:cid", validator, async (req, res) => {
 });
 
 router.post("/award/list", [
-  body("page").isInt({ min: 1 })
-], validator, async (req, res) => {
+  body("page").isInt({ min: 1 }),
+  validator,
+], async (req, res) => {
   try {
     const npp = 50;
     const page = req.body.page;
@@ -80,8 +81,9 @@ router.post("/award/list", [
 });
 
 router.get("/award/content/:id", [
-  param("id").isMongoId()
-], validator, async (req, res) => {
+  param("id").isMongoId(),
+  validator,
+], async (req, res) => {
   try {
     const award = await awardModel.findById(req.params.id);
     if (!award || !award.isShow) {
@@ -114,8 +116,9 @@ router.get("/award/content/:id", [
 
 router.post("/notice/list", [
   body("id").isString(),
-  body("page").isInt({ min: 1 })
-], validator, async (req, res) => {
+  body("page").isInt({ min: 1 }),
+  validator,
+], async (req, res) => {
   try {
     const campus = await campusModel.findOne({ id: req.body.id }, "_id");
     if (!campus) {
@@ -157,8 +160,9 @@ router.post("/notice/list", [
 });
 
 router.get("/notice/content/:id", [
-  param("id").isMongoId()
-], validator, async (req, res) => {
+  param("id").isMongoId(),
+  validator,
+], async (req, res) => {
   try {
     const notice = await noticeModel.findById(req.params.id);
     if (!notice) {
