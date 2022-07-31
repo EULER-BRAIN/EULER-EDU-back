@@ -28,9 +28,9 @@ router.post("/award", [
       .sort('-registDate').limit(npp).skip(npp*(page-1));
     awsS3.getS3List('awards/', (err, awardsS3) => {
       if (err) {
-        return res.status(401).json({
-          error: "management/main/award : internal server error"
-        })
+        return res.status(500).json({
+          error: "internal server error"
+        });
       }
       const imgList = [];
       awardsS3.Contents.forEach(item => {
@@ -71,9 +71,9 @@ router.post("/award", [
   }
   catch (e) {
     console.log(e);
-    return res.status(401).json({
-      error: "management/main/award : internal server error"
-    })
+    return res.status(500).json({
+      error: "internal server error"
+    });
   }
 });
 
@@ -85,9 +85,9 @@ router.get("/award/info/:id", [
     const id = req.params.id;
     const award = await awardModel.findById(id);
     if (!award) {
-      return res.status(403).json({
-        error: "management/main/award/info/:id : no corresponding teacher"
-      })
+      return res.status(404).json({
+        error: "no corresponding teacher"
+      });
     }
     awsS3.foundObject(`awards/${ award._id }`, (err, data) => {
       const imgFound = (err ? false : true);
@@ -96,9 +96,9 @@ router.get("/award/info/:id", [
   }
   catch(e) {
     console.log(e);
-    return res.status(401).json({
-      error: "management/main/award/info/:id : internal server error"
-    })
+    return res.status(500).json({
+      error: "internal server error"
+    });
   }
 });
 
@@ -121,9 +121,9 @@ router.post("/award/add", [
   }
   catch(e) {
     console.log(e);
-    return res.status(401).json({
-      error: "management/main/award/add : internal server error"
-    })
+    return res.status(500).json({
+      error: "internal server error"
+    });
   }
 })
 
@@ -146,9 +146,9 @@ router.post("/award/edit/name", [
   }
   catch(e) {
     console.log(e);
-    return res.status(401).json({
-      error: "management/main/award/edit/name : internal server error"
-    })
+    return res.status(500).json({
+      error: "internal server error"
+    });
   }
 });
 
@@ -171,9 +171,9 @@ router.post("/award/edit/content", [
   }
   catch(e) {
     console.log(e);
-    return res.status(401).json({
-      error: "management/main/award/edit/content : internal server error"
-    })
+    return res.status(500).json({
+      error: "internal server error"
+    });
   }
 });
 
@@ -196,9 +196,9 @@ router.post("/award/edit/isShow", [
   }
   catch(e) {
     console.log(e);
-    return res.status(401).json({
-      error: "management/main/award/edit/isShow : internal server error"
-    })
+    return res.status(500).json({
+      error: "internal server error"
+    });
   }
 });
 
@@ -210,15 +210,15 @@ router.get("/award/img/delete/:id", [
     const id = req.params.id;
     const award = await awardModel.findById(id);
     if (!award) {
-      return res.status(403).json({
-        error: "management/main/award/img/delete/:id : no corresponding teacher"
-      })
+      return res.status(404).json({
+        error: "no corresponding teacher"
+      });
     }
     awsS3.deleteObject(`awards/${ award._id }`, (err, data) => {
       if (err) {
-        return res.status(401).json({
-          error: "management/main/award/img/delete/:id : internal server error"
-        })
+        return res.status(500).json({
+          error: "internal server error"
+        });
       }
       res.json({
         award
@@ -227,9 +227,9 @@ router.get("/award/img/delete/:id", [
   }
   catch(e) {
     console.log(e);
-    return res.status(401).json({
-      error: "management/main/award/img/delete/:id : internal server error"
-    })
+    return res.status(500).json({
+      error: "internal server error"
+    });
   }
 });
 
@@ -241,9 +241,9 @@ router.post("/award/img/upload", [
   try {
     const award = await awardModel.findById(req.body.id);
     if (!award) {
-      return res.status(403).json({
-        error: "management/main/award/img/upload : no corresponding award"
-      })
+      return res.status(404).json({
+        error: "no corresponding award"
+      });
     }
     
     const key = `awards/${ award._id }`;
@@ -252,7 +252,7 @@ router.post("/award/img/upload", [
       if (err) {
         return res.status(500).json({
           error: "internal server error"
-        })
+        });
       }
       data.fields["Content-Type"] = type;
       data.fields["key"] = key;
@@ -264,9 +264,9 @@ router.post("/award/img/upload", [
   }
   catch(e) {
     console.log(e);
-    return res.status(401).json({
-      error: "management/main/award/img/upload : internal server error"
-    })
+    return res.status(500).json({
+      error: "internal server error"
+    });
   }
 })
 
@@ -282,9 +282,9 @@ router.get("/award/delete/:id", [
   }
   catch(e) {
     console.log(e);
-    return res.status(401).json({
-      error: "management/main/award/delete/:id : internal server error"
-    })
+    return res.status(500).json({
+      error: "internal server error"
+    });
   }
 });
 

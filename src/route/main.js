@@ -15,9 +15,9 @@ router.get("/", async (req, res) => {
   }
   catch (e) {
     console.log(e);
-    return res.status(401).json({
-      error: "main : internal server error"
-    })
+    return res.status(500).json({
+      error: "internal server error"
+    });
   }
 });
 
@@ -27,9 +27,9 @@ router.get("/:cid", async (req, res) => {
       id: req.params.cid, isShow: true
     });
     if (!campus) {
-      return res.status(403).json({
-        error: "main/:cid : no corresponding campus"
-      })
+      return res.status(404).json({
+        error: "no corresponding campus"
+      });
     }
     const notices = await noticeModel.find({
       campus: campus._id,
@@ -43,9 +43,9 @@ router.get("/:cid", async (req, res) => {
   }
   catch (e) {
     console.log(e);
-    return res.status(401).json({
-      error: "main/:cid : internal server error"
-    })
+    return res.status(500).json({
+      error: "internal server error"
+    });
   }
 });
 
@@ -74,9 +74,9 @@ router.post("/award/list", [
   }
   catch (e) {
     console.log(e);
-    return res.status(401).json({
-      error: "main/award/list : internal server error"
-    })
+    return res.status(500).json({
+      error: "internal server error"
+    });
   }
 });
 
@@ -87,9 +87,9 @@ router.get("/award/content/:id", [
   try {
     const award = await awardModel.findById(req.params.id);
     if (!award || !award.isShow) {
-      return res.status(403).json({
-        error: "main/award/content/:id : no corresponding award"
-      })
+      return res.status(404).json({
+        error: "no corresponding award"
+      });
     }
     const awardPrev = await awardModel.find({
       isShow: true,
@@ -108,9 +108,9 @@ router.get("/award/content/:id", [
   }
   catch (e) {
     console.log(e);
-    return res.status(401).json({
-      error: "main/award/content/:id : internal server error"
-    })
+    return res.status(500).json({
+      error: "internal server error"
+    });
   }
 });
 
@@ -122,7 +122,7 @@ router.post("/notice/list", [
   try {
     const campus = await campusModel.findOne({ id: req.body.id }, "_id");
     if (!campus) {
-      return res.status(400).json({
+      return res.status(404).json({
         error: "no corresponding campus"
       });
     }
@@ -155,7 +155,7 @@ router.post("/notice/list", [
     console.log(e);
     return res.status(500).json({
       error: "internal server error"
-    })
+    });
   }
 });
 
@@ -166,21 +166,21 @@ router.get("/notice/content/:id", [
   try {
     const notice = await noticeModel.findById(req.params.id);
     if (!notice) {
-      return res.status(403).json({
-        error: "main/notice/:id : no corresponding campus"
-      })
+      return res.status(404).json({
+        error: "no corresponding campus"
+      });
     }
     if (!notice.isShow) {
-      return res.status(403).json({
-        error: "main/notice/:id : no corresponding campus"
-      })
+      return res.status(404).json({
+        error: "no corresponding campus"
+      });
     }
     const teacher = await teacherModel.findById(notice.author, "_id id name campus");
     const campus = await campusModel.findById(notice.campus, "_id id name");
     if (!teacher || !campus) {
-      return res.status(401).json({
-        error: "main/notice/:id : internal server error"
-      })
+      return res.status(500).json({
+        error: "internal server error"
+      });
     }
     notice.author = teacher;
     notice.campus = campus;
@@ -190,9 +190,9 @@ router.get("/notice/content/:id", [
   }
   catch (e) {
     console.log(e);
-    return res.status(401).json({
-      error: "main/notice/:id : internal server error"
-    })
+    return res.status(500).json({
+      error: "internal server error"
+    });
   }
 });
 

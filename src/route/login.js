@@ -47,16 +47,16 @@ router.post('/try/teacher', [
   }
   hasher({ password: pw, salt: teacher.salt }, (err, pass, salt, hash) => {
     if (err) {
-      return res.status(401).json({
-        error: "login/try/teacher : internal server error"
-      })
+      return res.status(500).json({
+        error: "internal server error"
+      });
     }
     else if (hash == teacher.password || teacher.salt == 'empty') {
       loginTeacher(req, teacher.level, teacher.id, teacher.name, (err) => {
         if (err) {
-          return res.status(401).json({
-            error: "login/try/teacher : internal server error"
-          })
+          return res.status(500).json({
+            error: "internal server error"
+          });
         }
         else {
           return res.json({
@@ -77,9 +77,9 @@ router.post('/try/teacher', [
 router.get('/logout', (req, res) => {
   logout(req, res, (err) => {
     if (err) {
-      return res.status(401).json({
-        error: "login/try/teacher : internal server error"
-      })
+      return res.status(500).json({
+        error: "internal server error"
+      });
     }
     else {
       return res.json({

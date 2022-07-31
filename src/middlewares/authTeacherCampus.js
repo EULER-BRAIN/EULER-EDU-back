@@ -8,23 +8,23 @@ module.exports = async (req, res, next) => {
       campusId = teacher?.campus;
     }
     if (!campusId) {
-      return res.status(402).json({
-        error: "authTeacherCampus : Permission denied"
+      return res.status(401).json({
+        error: "permission denied"
       });
     }
   
     const campus = await campusModel.findById(campusId, "_id name");
     if (!campus) {
-      return res.status(402).json({
-        error: "authTeacherCampus : Permission denied"
+      return res.status(401).json({
+        error: "permission denied"
       });
     }
   
     if (req.loginLevel != 'administrator') {
       const teacher = await teacherModel.findOne({ id: req.loginId }, "campus");
       if (teacher?.campus.toString() != campus._id.toString()) {
-        return res.status(402).json({
-          error: "authTeacherCampus : Permission denied"
+        return res.status(401).json({
+          error: "permission denied"
         });
       }
     }
@@ -34,8 +34,8 @@ module.exports = async (req, res, next) => {
   }
   catch (e) {
     console.log(e);
-    return res.status(401).json({
-      error: "authTeacherCampus : internal server error"
-    })
+    return res.status(500).json({
+      error: "internal server error"
+    });
   }
 }

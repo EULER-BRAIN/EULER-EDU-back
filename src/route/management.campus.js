@@ -15,8 +15,8 @@ router.use(require('../middlewares/authTeacherCampus'));
 router.post("/teacher", async (req, res) => {
   try {
     if (req.loginLevel != 'administrator' && req.loginLevel != 'director') {
-      return res.status(402).json({
-        error: "management/campus/teacher : Permission denied"
+      return res.status(401).json({
+        error: "permission denied"
       });
     }
     let teachers = await teacherModel.find({
@@ -35,9 +35,9 @@ router.post("/teacher", async (req, res) => {
   }
   catch (e) {
     console.log(e);
-    return res.status(401).json({
-      error: "management/campus/teacher : internal server error"
-    })
+    return res.status(500).json({
+      error: "internal server error"
+    });
   }
 })
 
@@ -47,17 +47,17 @@ router.post("/teacher/info", [
 ], async (req, res) => {
   try {
     if (req.loginLevel != 'administrator' && req.loginLevel != 'director') {
-      return res.status(402).json({
-        error: "management/campus/teacher : Permission denied"
+      return res.status(401).json({
+        error: "permission denied"
       });
     }
     const teacher = await teacherModel.findOne({
       id: req.body.id
     });
     if (!teacher) {
-      return res.status(403).json({
-        error: "management/campus/teacher : no corresponding teacher"
-      })
+      return res.status(404).json({
+        error: "no corresponding teacher"
+      });
     }
     res.json({
       teacher: teacher
@@ -65,9 +65,9 @@ router.post("/teacher/info", [
   }
   catch (e) {
     console.log(e);
-    return res.status(401).json({
-      error: "management/campus/teacher/info : internal server error"
-    })
+    return res.status(500).json({
+      error: "internal server error"
+    });
   }
 });
 
@@ -81,19 +81,19 @@ router.post("/teacher/edit/name", [
       id: req.body.id
     });
     if (!teacher) {
-      return res.status(403).json({
-        error: "management/campus/edit/name : no corresponding teacher"
-      })
+      return res.status(404).json({
+        error: "no corresponding teacher"
+      });
     }
     if (teacher.campus.toString() != req.campusId.toString()) {
-      return res.status(402).json({
-        error: "management/campus/teacher/edit/name : Permission denied"
+      return res.status(401).json({
+        error: "permission denied"
       });
     }
     if (req.loginLevel != 'administrator' && req.loginLevel == 'director') {
       if (req.body.id != req.loginId) {
-        return res.status(402).json({
-          error: "management/campus/teacher/edit/name : Permission denied"
+        return res.status(401).json({
+          error: "permission denied"
         });
       }
     }
@@ -111,9 +111,9 @@ router.post("/teacher/edit/name", [
   }
   catch (e) {
     console.log(e);
-    return res.status(401).json({
-      error: "management/campus/teacher/edit/name : internal server error"
-    })
+    return res.status(500).json({
+      error: "internal server error"
+    });
   }
 });
 
@@ -127,19 +127,19 @@ router.post("/teacher/edit/password", [
       id: req.body.id
     });
     if (!teacher) {
-      return res.status(403).json({
-        error: "management/campus/edit/password : no corresponding teacher"
-      })
+      return res.status(404).json({
+        error: "no corresponding teacher"
+      });
     }
     if (teacher.campus.toString() != req.campusId.toString()) {
-      return res.status(402).json({
-        error: "management/campus/teacher/edit/password : Permission denied"
+      return res.status(401).json({
+        error: "permission denied"
       });
     }
     if (req.loginLevel != 'administrator' && req.loginLevel == 'director') {
       if (req.body.id != req.loginId) {
-        return res.status(402).json({
-          error: "management/campus/teacher/edit/password : Permission denied"
+        return res.status(401).json({
+          error: "permission denied"
         });
       }
     }
@@ -147,9 +147,9 @@ router.post("/teacher/edit/password", [
     hasher({ password: req.body.password }, async (err, pass, salt, hash) => {
       if (err) {
         console.log(err);
-        return res.status(401).json({
-          error: "management/campus/teacher/edit/password : internal server error"
-        })
+        return res.status(500).json({
+          error: "internal server error"
+        });
       }
       const teacherAfter = await teacherModel.findOneAndUpdate({
         id: req.body.id
@@ -166,9 +166,9 @@ router.post("/teacher/edit/password", [
   }
   catch (e) {
     console.log(e);
-    return res.status(401).json({
-      error: "management/campus/teacher/edit/password : internal server error"
-    })
+    return res.status(500).json({
+      error: "internal server error"
+    });
   }
 });
 
@@ -192,9 +192,9 @@ router.post("/notice", [
     for (let i = 0; i < notices.length; i++) {
       const author = await teacherModel.findById(notices[i].author, "_id name");
       if (!author) {
-        return res.status(405).json({
-          error: "management/campus/notice : contradiction on database"
-        })
+        return res.status(409).json({
+          error: "conflict on database"
+        });
       }
       notices[i].author = author;
     }
@@ -206,9 +206,9 @@ router.post("/notice", [
   }
   catch (e) {
     console.log(e);
-    return res.status(401).json({
-      error: "management/campus/notice : internal server error"
-    })
+    return res.status(500).json({
+      error: "internal server error"
+    });
   }
 })
 
@@ -223,9 +223,9 @@ router.post("/notice/add", [
     const dateNow = new Date();
     const author = await teacherModel.findOne({ id: req.loginId }, "_id");
     if (!author) {
-      return res.status(401).json({
-        error: "management/campus/notice/add : internal server error"
-      })
+      return res.status(500).json({
+        error: "internal server error"
+      });
     }
     const notice = new noticeModel({
       title: req.body.title,
@@ -244,9 +244,9 @@ router.post("/notice/add", [
   }
   catch (e) {
     console.log(e);
-    return res.status(401).json({
-      error: "management/campus/notice/add : internal server error"
-    })
+    return res.status(500).json({
+      error: "internal server error"
+    });
   }
 });
 
@@ -272,7 +272,7 @@ router.post("/poster", [
       if (!author) {
         return res.status(409).json({
           error: "conflict on database"
-        })
+        });
       }
       posters[i].author = author;
     }
@@ -286,7 +286,7 @@ router.post("/poster", [
     console.log(e);
     return res.status(500).json({
       error: "internal server error"
-    })
+    });
   }
 });
 
@@ -300,14 +300,14 @@ router.get("/poster/info/:id", [
     if (!poster) {
       return res.status(404).json({
         error: "no corresponding poster"
-      })
+      });
     }
 
     const author = await teacherModel.findById(poster.author, "_id name");
     if(!author) {
       return res.status(409).json({
         error: "conflict on database"
-      })
+      });
     }
     poster.author = author;
 
@@ -320,7 +320,7 @@ router.get("/poster/info/:id", [
     console.log(e);
     return res.status(500).json({
       error: "internal server error"
-    })
+    });
   }
 });
 
@@ -335,7 +335,7 @@ router.post("/poster/add", [
     if (!author) {
       return res.status(500).json({
         error: "internal server error"
-      })
+      });
     }
 
     const poster = new posterModel({
@@ -356,7 +356,7 @@ router.post("/poster/add", [
     console.log(e);
     return res.status(500).json({
       error: "internal server error"
-    })
+    });
   }
 })
 
@@ -371,7 +371,7 @@ router.post("/poster/img/upload", [
     if (!poster) {
       return res.status(404).json({
         error: "no corresponding poster"
-      })
+      });
     }
 
     const key = `posters/${ poster._id }`;
@@ -380,7 +380,7 @@ router.post("/poster/img/upload", [
       if (err) {
         return res.status(500).json({
           error: "internal server error"
-        })
+        });
       }
       data.fields["Content-Type"] = type;
       data.fields["key"] = key;
@@ -394,7 +394,7 @@ router.post("/poster/img/upload", [
     console.log(e);
     return res.status(500).json({
       error: "internal server error"
-    })
+    });
   }
 })
 

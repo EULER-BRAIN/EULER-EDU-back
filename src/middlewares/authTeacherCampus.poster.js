@@ -8,7 +8,7 @@ module.exports = async (req, res, next) => {
     if (!teacher) {
       return res.status(500).json({
         error: "internal server error"
-      })
+      });
     }
 
     const posterId = req.body.id || req.query.id || req.params.id;
@@ -16,7 +16,7 @@ module.exports = async (req, res, next) => {
     if (!poster) {
       return res.status(404).json({
         error: "no corresponding poster"
-      })
+      });
     }
 
     if (req.loginLevel != 'administrator' && req.loginLevel == 'director') {
@@ -33,6 +33,6 @@ module.exports = async (req, res, next) => {
     console.log(e);
     return res.status(500).json({
       error: "internal server error"
-    })
+    });
   }
 }
